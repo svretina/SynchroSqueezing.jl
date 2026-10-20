@@ -1,0 +1,16 @@
+name = "SynchroSqueezingExperiments"
+uuid = "4ae3192a-c516-4fa7-a1a8-0f5f1f5a173f"
+version = "0.1.0"
+
+[deps]
+BenchmarkTools = "6e4b80f9-dd63-53aa-95a3-0cdb28fa8baf"
+ContinuousWavelet = "f4805cc5-8dd6-48ca-a5e0-9d6fc2d45b8d"
+ContinuousWavelets = "96eb917e-2868-4417-9cb6-27e7ff17528f"
+
+[sources]
+ContinuousWavelet = {url = "https://github.com/hmatuschek/ContinuousWavelet.jl.git", rev = "23c49cdafee0ae21aeba2755924d6ef59b4e5637"}
+
+[compat]
+BenchmarkTools = "1"
+ContinuousWavelets = "1.2"
+julia = "1.10"

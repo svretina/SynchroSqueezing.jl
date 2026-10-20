@@ -1,0 +1,19 @@
+# Julia
+Manifest.toml
+!experiments/Manifest.toml
+*.ji
+*.cov
+*.mem
+*.prof
+
+# Documentation builds
+docs/build/
+
+# Python reference environment and generated artifacts
+reference/python/.venv/
+reference/python/__pycache__/
+reference/python/generated/
+*.npz
+
+# Benchmark outputs
+benchmarks/results/
