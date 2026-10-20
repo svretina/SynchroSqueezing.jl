@@ -17,3 +17,6 @@ reference/python/generated/
 
 # Benchmark outputs
 benchmarks/results/
+
+# Local graph analysis
+graphify-out/GRAPH_REPORT.md
