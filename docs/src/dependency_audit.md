@@ -9,7 +9,7 @@ a production dependency.
 
 No external numerical library is a hard runtime dependency in Milestone 00.
 Milestone 01 selected `ContinuousWavelets.jl` v1.2.2 as the provisional CWT
-backend, subject to the derivative and metadata checks documented in the
+backend, with the derivative and metadata checks documented in the
 [backend decision](backend_decision.md). `ContinuousWavelet.jl` was evaluated
 from a Git-pinned source because it is not registered, then rejected for the
 production path. `DSP.jl` remains the provisional STFT backend for a later
@@ -18,10 +18,10 @@ analytic continuous transform.
 
 | Package | Publicly documented capability | CWT/SST relevance | Decision |
 | --- | --- | --- | --- |
-| [ContinuousWavelets.jl](https://github.com/UCD4IDS/ContinuousWavelets.jl) | 1-D CWT, Fourier-domain wavelets, `cwt`, `icwt`, `computeWavelets`, `getMeanFreq`, and multiple inverse-frame choices | Supports tested complex and Float32 inputs; returns time × scale matrices and exposes analyticity warnings | Selected core CWT dependency (`1.2`); adapter/derivative validation remains M02 work |
+| [ContinuousWavelets.jl](https://github.com/UCD4IDS/ContinuousWavelets.jl) | 1-D CWT, Fourier-domain wavelets, `cwt`, `icwt`, `computeWavelets`, `getMeanFreq`, and multiple inverse-frame choices | Supports tested complex and Float32 inputs; returns time × scale matrices and exposes analyticity warnings | Selected core CWT dependency (`1.2`); wrapped by the periodic adapter |
 | [ContinuousWavelet.jl](https://hmatuschek.github.io/ContinuousWavelet.jl/stable/) | Planned CWT object, Morlet and Cauchy/Paul wavelets, transformed-array object, and synthesis | Source-level test confirms time × voice output, Float64-real-only transform dispatch, and poor nominal-scale reconstruction | Rejected for the production path; retained only as a pinned experiment comparison |
 | [DSP.jl](https://docs.juliadsp.org/dev/periodograms/) | Complex STFT, windows, periodogram/spectrogram utilities | Appropriate FSST infrastructure, but standard STFT hop/centering/phase and inverse requirements need a dedicated adapter | Candidate for later optional/core FSST dependency; not used for WSST |
-| [FFTW.jl](https://github.com/JuliaMath/FFTW.jl) | FFT interface, plans, FFTW controls | Needed only if a selected backend cannot publicly supply a spectral CWT derivative | Defer; use for a narrow derivative bridge only after public/backend-extension options are exhausted |
+| [FFTW.jl](https://github.com/JuliaMath/FFTW.jl) | FFT interface, plans, FFTW controls | Multiplies the selected backend's public Fourier daughters by `iω` for the periodic CWT derivative | Selected as a narrow, local derivative bridge; it does not replace the CWT backend |
 | [Wavelets.jl](https://github.com/JuliaDSP/Wavelets.jl) | DWT/WPT/MODWT, thresholding, denoising, noise estimation, GPU array support | Discrete transforms and preprocessing are not the analytic CWT required for standard WSST | Optional preprocessing extension only |
 | [WaveletsExt.jl](https://github.com/UCD4IDS/WaveletsExt.jl) | Companion extensions/utilities to the Julia wavelet ecosystem | No verified public primitive required by the WSST core | Inspect only if the CWT prototype identifies a concrete missing facility |
 | [NPZ.jl](https://github.com/JuliaIO/NPZ.jl) | NumPy `.npy`/`.npz` interchange | Allows Julia tests to consume small Python fixtures without Python at runtime | Test-only candidate |

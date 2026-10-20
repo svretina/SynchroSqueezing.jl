@@ -4,8 +4,8 @@
 
 **Select `ContinuousWavelets.jl` v1.2.2 as the package's CWT backend.** It is
 now a declared core dependency, constrained to the 1.2 release series. Its
-derivative support, normalization metadata, and inversion compatibility must
-still pass the next milestone’s adapter tests before an SST API is exposed.
+derivative support, normalization metadata, and inversion compatibility have
+passed the Milestone 02 adapter tests. This does not expose an SST API yet.
 
 `ContinuousWavelet.jl` v0.1.0 is rejected as a production backend and retained
 only in the isolated experiment environment. Its planned-transform design is
@@ -90,13 +90,22 @@ The forthcoming adapter must:
 4. Derive SST quadrature and inverse weights from this backend convention; do
    not reuse the backend’s `icwt` constants without verification.
 
-## Open Milestone 02 questions
+## Milestone 02 adapter result
 
-- Can public `computeWavelets` output and `cwt` overloads supply a spectral
-  `∂tW` using the backend’s exact scales and normalization?
-- Are reusable daughters and FFT plans available through stable public methods,
-  and can they eliminate the observed per-transform allocation cost?
-- Which inverse frame and restricted reliable-frequency band give the required
-  WSST reconstruction behavior?
-- What padding/cropping semantics and cone-of-influence equivalent does the
-  backend expose?
+The adapter uses the documented public `computeWavelets` daughters and the
+selected periodic CWT convention to compute
+`IFFT(iω * x̂₊ * daughter)` with a small local FFTW bridge. It neither rewrites
+the CWT nor uses backend internals. Its public result is a non-copying
+frequency × time view, with physical ascending-Hz frequencies, midpoint-bin
+weights, an explicit DC-leakage validity mask, and enough backend metadata to
+call `PenroseDelta()` inversion.
+
+For a 1024-sample, 1024 Hz periodic 64 Hz tone, the peak coefficient's
+phase-derived frequency is correct to `1e-8` Hz in the regression test. The
+spectral derivative and centered finite difference agree within 4% in relative
+norm; that expected finite-difference truncation error is only a validation
+comparison. The adapter rejects non-periodic boundaries rather than assigning
+unverified edge semantics.
+
+Future work is limited to performance reuse, other boundary modes, and SST
+quadrature/reconstruction—not a replacement CWT implementation.

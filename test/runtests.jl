@@ -2,6 +2,7 @@ using Test
 using SynchroSqueezing
 
 include("signals.jl")
+include("test_backends.jl")
 
 @testset "SynchroSqueezing.jl package foundation" begin
     @test SynchroSqueezing.package_version() == v"0.1.0-DEV"

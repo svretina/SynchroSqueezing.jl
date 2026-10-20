@@ -9,19 +9,20 @@ Julia implementations of continuous wavelet transforms and STFTs where they
 are mathematically suitable. The package’s new numerical work will be the
 synchrosqueezing, ridge-tracking, and reconstruction layers.
 
-`ContinuousWavelets.jl` is the selected CWT backend. The package will add its
-SST-specific adapter, derivative support, and metadata validation in the next
-milestone.
+`ContinuousWavelets.jl` is the selected CWT backend. The package includes a
+small periodic adapter with derivative support, metadata validation, and CWT
+inversion; synchrosqueezing itself comes in later milestones.
 
 ## Status
 
-Milestone 00 is in progress. The current source only establishes package,
-testing, documentation, and reproducible-reference infrastructure; it does
-not yet provide a public transform API.
+Milestone 02 is complete. The current public API provides a periodic CWT,
+its exact spectral time derivative, a phase-based frequency estimate, and
+full CWT inversion. It does not yet provide an SST or ridge API.
 
 See the [roadmap](roadmap/README.md), [numerical conventions](docs/src/conventions.md),
 [dependency audit](docs/src/dependency_audit.md), and [provisional backend
-decision](docs/src/backend_decision.md).
+decision](docs/src/backend_decision.md), and [CWT adapter
+contract](docs/src/backend_adapter.md).
 
 ## Development
 

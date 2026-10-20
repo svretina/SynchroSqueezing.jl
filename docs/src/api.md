@@ -1,9 +1,20 @@
 # API status
 
-There is no transform API during Milestone 00. The sole exported function
-verifies that the package skeleton loads; it is not part of the intended
-scientific interface.
+Milestone 02 provides a periodic CWT adapter, exact spectral derivative, and
+phase-based frequency estimate. Synchrosqueezing and ridge extraction are not
+implemented yet.
 
 ```@docs
 SynchroSqueezing.package_version
+SynchroSqueezing.plan_cwt
+SynchroSqueezing.cwt
+SynchroSqueezing.inverse_cwt
+SynchroSqueezing.instantaneous_frequency
+SynchroSqueezing.AbstractCWTBackend
+SynchroSqueezing.ContinuousWaveletsBackend
+SynchroSqueezing.CWTPlan
+SynchroSqueezing.CWTMetadata
+SynchroSqueezing.CWTResult
+SynchroSqueezing.FrequencyEstimate
+SynchroSqueezing.WaveletValidation
 ```
