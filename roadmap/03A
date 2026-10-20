@@ -1,0 +1,627 @@
+# Milestone 03A — Mathematically Correct WSST Reconstruction
+
+Agent implementation specification · SynchroSqueezing.jl · Corrective milestone before ridge extraction
+
+## Objective
+
+Establish a mathematically consistent implementation of the first-order wavelet synchrosqueezed transform (WSST) and its inverse, independent of the particular Julia wavelet library used to compute the CWT.
+
+The package must support two essential operations:
+
+1. Full oscillatory reconstruction: recover the signal's represented oscillatory content from all synchrosqueezed coefficients.
+2. Individual component reconstruction: recover a physical oscillatory component by integrating only coefficients within a time-dependent frequency band.
+
+The second operation is particularly important for your future BNS post-merger analysis.
+
+The existing Milestone 03 implementation should be audited and reused wherever mathematically correct. We should not rewrite working thresholding, grid generation, phase estimation, deposition, or test infrastructure simply because the inverse needs reconsideration.
+
+## 1. Scientific decision
+
+Adopt the standard analytic-CWT-based synchrosqueezing formulation used by `ssqueezepy` as the reference mathematical convention.
+
+The source of `ssqueezepy` confirms that `issq_cwt` reconstructs a real signal by summing selected complex SST coefficients, taking their real part, and applying the wavelet admissibility coefficient. Its component reconstruction uses the same operation restricted to selected time-frequency bins.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
+
+
+This becomes the primary contract for our package.
+
+Target mathematical pipeline
+
+Analytic L¹-normalized CWT
+
+\\(W_x(a,t)\\)
+
+Phase-based instantaneous frequency
+
+\\(\widehat f(a,t)=\frac{1}{2\pi}\operatorname{Im}\frac{\partial_tW_x}{W_x}\\)
+
+Complex coefficient reassignment
+
+\\(T\_{j,n}=\sum\_{k\mapsto j}w_kW\_{k,n}\\)
+
+Full oscillatory inverse
+
+\\(x\_{\rm osc}\approx\frac{2}{C\_\psi}\operatorname{Re}\sum_jT_j\\)
+
+Component inverse
+
+\\(x_k\approx\frac{2}{C\_\psi}\operatorname{Re}\sum\_{j\in B_k}T_j\\)
+
+The formulas above assume the conventional analytic wavelet with real positive \\(C\_\psi\\), and bin-integrated SST coefficients. The implementation must also handle the corresponding complex synthesis correctly.
+
+Important distinction: full reconstruction from a discretized, truncated wavelet transform need not achieve machine precision under this standard inverse. The acceptance requirement is mathematically correct normalization, controlled approximation error, and demonstrable convergence. Component reconstruction must be validated separately.
+
+## 2. Theory the agent must implement
+
+### 2.1 CWT definition
+
+Adopt the \\(L^1\\)-normalized analytic CWT:
+
+\\[ W_x(a,b)= \frac1a\int\_{-\infty}^{\infty} x(t)\psi^\*\left(\frac{t-b}{a}\right)\\,dt, \qquad a>0. \\]
+
+With the Fourier convention
+
+\\[ \widehat x(\omega)=\int x(t)e^{-i\omega t}\\,dt, \\]
+
+this yields
+
+\\[ W_x(a,b)=\frac{1}{2\pi} \int\widehat x(\omega)\widehat\psi^\*(a\omega)e^{i\omega b}\\,d\omega. \\]
+
+For an analytic wavelet, the response is supported on positive frequencies.
+
+Define the positive-frequency admissibility constant:
+
+\\[ \boxed{ C\_\psi=\int_0^\infty \frac{\widehat\psi^\*(u)}{u}\\,du. } \\]
+
+This is the constant associated with the direct scale-integral synthesis, and must not be confused with the squared-modulus admissibility constant used in another standard CWT reconstruction formula.
+
+### 2.2 Continuous inversion
+
+Integrating over scale:
+
+\\[ S_x(b)=\int_0^\infty W_x(a,b)\frac{da}{a}. \\]
+
+For a sufficiently regular analytic wavelet and signal, exchanging the integrations gives
+
+\\[ S_x(b)= \frac{C\_\psi}{2\pi} \int_0^\infty\widehat x(\omega)e^{i\omega b}\\,d\omega. \\]
+
+Thus, under the ordinary analytic-signal convention \\(x\_+=x+i\mathcal Hx\\),
+
+\\[ \boxed{ x\_+(b)=\frac{2}{C\_\psi}S_x(b). } \\]
+
+For a real signal,
+
+\\[ \boxed{ x(b)=2\operatorname{Re}\left[\frac{S_x(b)}{C\_\psi}\right]. } \\]
+
+If \\(C\_\psi\\) is real positive, this becomes the familiar \\(2\operatorname{Re}S_x/C\_\psi\\).
+
+For an already analytic complex input \\(z=x\_+\\), the corresponding reconstruction is
+
+\\[ \boxed{ z(b)=\frac{2}{C\_\psi}S_z(b). } \\]
+
+The factor of two here follows from the definition of the analytic signal and the one-sided Fourier integral. It should not be confused with the relationship between the analytic signal and the positive-frequency projection \\(P\_+x\\), for which \\(P\_+x=S_x/C\_\psi\\).
+
+These factors must be derived, unit-tested, and documented. Do not select them by fitting a tone amplitude.
+
+### 2.3 Discrete scale integration
+
+For logarithmic scales,
+
+\\[ a_k=a\_{\min}2^{k/n_v}, \\]
+
+the integration measure satisfies
+
+\\[ d\log a=\frac{da}{a}. \\]
+
+The discrete approximation is
+
+\\[ S_x(t_n)\approx \sum_kw_kW_x(a_k,t_n), \qquad w_k\approx\frac{\log 2}{n_v}. \\]
+
+Use the actual scale coordinates and a documented quadrature rule. The constant-spacing approximation is appropriate for uniformly log-spaced interior nodes, but endpoints, irregular grids, and alternative scale discretizations need explicit weights.
+
+The implementation must also test whether the chosen finite scale range covers the physical frequencies of interest.
+
+### 2.4 Synchrosqueezing and its inverse
+
+Estimate the instantaneous frequency:
+
+\\[ \widehat f\_{k,n}= \frac{\operatorname{Im} \left[ (\partial_tW\_{k,n})\overline{W\_{k,n}} \right]} {2\pi|W\_{k,n}|^2}. \\]
+
+Reassign each accepted weighted contribution \\(w_kW\_{k,n}\\) into an output frequency bin.
+
+Define the squeezed coefficients as bin-integrated complex values:
+
+\\[ T\_{j,n}= \sum\_{k\mapsto j}w_kW\_{k,n}. \\]
+
+Then, for complete deposition,
+
+\\[ \sum_jT\_{j,n} = \sum_kw_kW\_{k,n}. \\]
+
+Consequently, the real-signal inverse is
+
+\\[ x\_{\rm osc}(t_n) \approx 2\operatorname{Re}\left[ \frac{1}{C\_\psi} \sum_jT\_{j,n} \right]. \\]
+
+For a component occupying a region \\(B(t)\\),
+
+\\[ x_B(t_n) \approx 2\operatorname{Re}\left[ \frac{1}{C\_\psi} \sum\_{j\in B(t_n)}T\_{j,n} \right]. \\]
+
+The same synthesis formula must work for arbitrary time-frequency masks. No original waveform or CWT coefficient matrix may be required at this stage.
+
+### 2.5 Numerical qualification
+
+The continuous identity presupposes a valid analytic wavelet, complete integration over the relevant scales, and appropriate signal regularity.
+
+A finite discrete CWT introduces:
+
+- Scale quadrature error.
+- Frequency truncation.
+- Boundary and padding effects.
+- Finite FFT resolution.
+- Possible imperfect analytic wavelets.
+- Floating-point error.
+
+The agent must establish a reliable frequency region and measure convergence under refinement.
+
+Do not mistake a near-perfect dual-frame inverse for proof that the scale-summation SST inverse is accurate.
+
+Normalization clarification for implementation: for an already analytic complex input \\(z\\), all its Fourier content is at positive frequencies, so the correct formula under the definitions above is
+
+\\[ \boxed{z(t)=\frac{S_z(t)}{C\_\psi}.} \\]
+
+The factor of two is required when reconstructing a real signal from its positive-frequency projection, or when constructing the analytic signal of a real input. It must not be applied again to an input that is already analytic complex. This is an important dedicated test for the agent.
+
+## 3. Agent instructions — implementation plan
+
+# Milestone 03A — Standard WSST Reconstruction and Backend Verification
+
+## Mission
+
+Correctly implement and independently validate standard wavelet synchrosqueezing reconstruction in `SynchroSqueezing.jl`.
+
+We are not committed to `ContinuousWavelets.jl` as the underlying CWT backend. It is a reusable implementation, not the mathematical definition of the package.
+
+The standard WSST inverse and reconstruction of individual oscillatory components are first-class requirements.
+
+Preserve all validated Milestone 03 functionality and avoid unnecessary rewrites.
+
+Do not begin automatic ridge tracking until the reconstruction foundation has passed the tests described below.
+
+## Phase A — Inspect existing code and establish a baseline
+
+Read and analyze:
+
+- `src/squeezing/wsst.jl`
+- `src/reconstruction/inverse_wsst.jl`
+- `docs/src/wsst_conventions.md`
+- Current CWT backend adapter and derivative implementation.
+- Existing reconstruction and convergence tests.
+- Pinned Python `ssqueezepy==0.6.6` reference scripts.
+
+Create `docs/src/reconstruction_audit.md`.
+
+The audit must answer:
+
+1. What exact CWT normalization is implemented?
+2. What scale quadrature is used?
+3. Is the output SST bin-integrated or a frequency density?
+4. How is the synthesis-response correction calculated and applied?
+5. Are original CWT coefficients or original-signal samples required for inversion?
+6. How much of the reported 1e-12 reconstruction accuracy comes from retained DC or residual contributions?
+7. Does the current inverse support arbitrary frequency-time masks?
+8. How is a real input distinguished from an already analytic complex input?
+9. Does the backend actually provide an analytic wavelet?
+10. Can standard WSST inversion work directly with its coefficients?
+
+Keep the existing implementation intact until the audit is complete.
+
+Record the current test and benchmark results so regressions can be detected.
+
+## Phase B — Implement the standard theoretical normalization
+
+Adopt the explicitly documented L1 analytic-CWT convention:
+
+```
+W(a,b) = ∫ x(t) conj(ψ((t-b)/a)) dt/a
+```
+
+with Fourier convention:
+
+```
+x̂(ω) = ∫ x(t) exp(-iωt) dt
+```
+
+and positive-frequency reconstruction constant:
+
+```
+Cψ = ∫₀∞ conj(ψ̂(u)) du/u
+```
+
+Define:
+
+```
+S(t) = ∫₀∞ W(a,t) da/a
+```
+
+For a real input, reconstruct:
+
+```
+xosc(t) = 2 real(S(t)/Cψ)
+```
+
+For an already analytic complex input, reconstruct:
+
+```
+z(t) = S(t)/Cψ
+```
+
+If the complex input is the analytic signal associated with a real input, do not apply an additional factor of two.
+
+The zero-frequency/DC contribution is not represented by the strictly analytic wavelet and must be handled separately when full-input reconstruction is requested.
+
+Calculate Cψ independently from the wavelet definition using numerically convergent quadrature, preferably with an analytical value or independently checked reference when available.
+
+Do not infer Cψ from the original waveform.
+
+## Phase C — Verify the discrete wavelet synthesis identity
+
+For the selected backend, obtain its Fourier-domain analysis filters Hₖ(ω).
+
+Compute the weighted synthesis response:
+
+```
+R(ω) = Σₖ wₖ Hₖ(ω)
+```
+
+after correcting any backend scaling to the chosen mathematical convention.
+
+For positive frequencies inside the reliable transform band, test:
+
+```
+R(ω) ≈ Cψ
+```
+
+For negative frequencies, check analytic-wavelet suppression.
+
+Calculate and plot:
+
+- Real and imaginary parts of R(ω)/Cψ.
+- Absolute deviation from one.
+- Relative magnitude error.
+- Phase error.
+- Error versus voices per octave.
+- Error versus number of covered octaves.
+- Error near DC and Nyquist.
+
+Distinguish the continuous admissibility identity from its finite discrete approximation.
+
+Do not apply 1/R(ω) or any other frequency-dependent correction during this test.
+
+Use the actual filters generated by the backend; do not assume they implement textbook wavelet normalization.
+
+## Phase D — Decide whether to retain the CWT backend
+
+Evaluate three options in order:
+
+1. Configure ContinuousWavelets.jl to deliver compatible analytic, L1-normalized coefficients.
+2. Introduce a thin adapter converting existing coefficients to the required normalization while preserving transform consistency.
+3. Implement a dedicated FFTW-based analytic CWT using reused wavelet definitions and existing utilities.
+
+The third option is permitted if the current library imposes normalization or frame constraints incompatible with accurate standard WSST synthesis.
+
+Compare all viable options using identical wavelets, scale grids, precision, sampling frequency, and padding.
+
+Select based on:
+
+- Mathematical correctness.
+- Reconstruction convergence.
+- Derivative consistency.
+- Public API stability.
+- Performance and allocations.
+- Ease of testing and maintenance.
+
+Document the decision before changing the production backend.
+
+Do not implement a new general-purpose wavelet library.
+
+## Phase E — Standard inverse implementation
+
+Implement a reconstruction primitive that operates exclusively on a supplied SST coefficient matrix, its reconstruction constant, and optional mask.
+
+Suggested interfaces:
+
+```
+inverse_wsst(result; method=:standard)
+reconstruct_region(result, mask; method=:standard)
+```
+
+Masks must support selecting an arbitrary subset of time-frequency bins.
+
+For the standard inverse:
+
+- Sum the selected complex coefficients per time.
+- Apply the correct admissibility coefficient.
+- Return real output for real-input results.
+- Return complex output for analytic-complex results.
+- Do not apply extra frequency-bin widths when stored SST values are bin-integrated.
+- Do not use the original signal, raw CWT, or derivative.
+- Do not silently include excluded contributions.
+- Do not apply a discrete-frame synthesis filter.
+
+Keep the existing frame-corrected or residual-assisted inverse under a distinct, explicitly named method if it is independently useful.
+
+The standard inverse must be independently executable on a serialized SST result with the necessary metadata.
+
+## Phase F — Test inversion independently of reassignment
+
+Using known CWT coefficients, calculate:
+
+```
+S(t) = Σₖ wₖ Wₖ(t)
+```
+
+Then reconstruct directly from S(t).
+
+Test positive-frequency complex tones, real tones, chirps, AM signals, and combinations.
+
+Only after these tests pass should the equivalent sums be reconstructed from reassigned SST coefficients.
+
+Verify:
+
+```
+Σⱼ Tⱼ(t) ≈ Σₖ wₖ Wₖ(t)
+```
+
+for fully deposited valid coefficients.
+
+Compare nearest-bin and linear-bin reassignment; both should give equivalent complete sums within floating-point accumulation tolerance.
+
+Keep deposition conservation tests separate from waveform reconstruction tests.
+
+## Phase G — Individual component reconstruction
+
+This phase is mandatory even though automatic ridge extraction belongs to the next milestone.
+
+Generate known two- and three-component synthetic signals.
+
+Use the exact analytical instantaneous-frequency curves to define frequency-time masks.
+
+Reconstruct each component from its selected SST coefficients.
+
+Test:
+
+- Widely separated complex tones.
+- Widely separated real tones.
+- Parallel chirps.
+- Linear chirps with different slopes.
+- Quadratic chirps.
+- Exponentially evolving frequencies.
+- Amplitude-modulated components.
+- Components with unequal amplitudes.
+- Components that approach each other.
+
+Do not use an automatic ridge tracker.
+
+Measure each reconstructed component against its exact original component.
+
+In addition to relative L2 error, measure amplitude and phase error, cross-component contamination, and reconstruction sensitivity to band width.
+
+Use known component masks so that failure can be attributed to the transform or reconstruction rather than ridge tracking.
+
+Crossing components should be treated as limitation tests, not guaranteed-perfect recovery cases.
+
+## Phase H — Python reference comparison
+
+Inspect pinned ssqueezepy 0.6.6 source and reference fixtures.
+
+Confirm the exact:
+
+- Wavelet Fourier response.
+- L1 normalization.
+- Scale quadrature.
+- Admissibility constant.
+- Instantaneous-frequency convention.
+- Deposition semantics.
+- Inverse scaling.
+- Ridge-band component reconstruction.
+
+Create identical synthetic signals and match numerical configurations wherever possible.
+
+Compare Julia and Python on:
+
+1. Raw CWT coefficients.
+2. Derivative coefficients.
+3. Instantaneous-frequency estimates.
+4. Squeezed complex coefficients.
+5. Full oscillatory reconstruction.
+6. Individual component reconstruction.
+7. Reconstruction errors and convergence.
+
+Where numerical grids differ, compare physical quantities against analytical ground truth rather than demanding pointwise equality.
+
+Python remains a test-only dependency.
+
+## Phase I — Robustness and convergence
+
+Run controlled convergence studies over:
+
+- Voices per octave.
+- Scale coverage.
+- Output frequency-bin resolution.
+- Signal sampling rate.
+- Padded length.
+- Float32 and Float64 precision.
+- Wavelet parameters.
+
+Use interior-region error masks and report boundary errors separately.
+
+Test non-power-of-two and odd-length signals, zero signals, near-DC and near-Nyquist tones, and unsupported two-sided complex signals.
+
+Explicitly confirm that linear and nearest-bin deposition conserve accepted complex contributions even when frequency localization quality differs.
+
+Do not improve reported accuracy using an original-signal residual.
+
+## Phase J — Performance regression
+
+Benchmark the new standard inverse separately from:
+
+- Backend CWT.
+- CWT spectral derivative.
+- Phase estimation.
+- SST deposition.
+- Existing frame-corrected inverse.
+
+The standard inverse should require only a frequency-bin reduction and a scalar reconstruction factor per time sample.
+
+Avoid introducing unnecessary FFTs, dense matrices, memory allocations, or backend-specific dependencies into this operation.
+
+Optimize only after the reference implementation passes.
+
+## Required deliverables
+
+Source:
+
+- Standard inverse implementation.
+- Admissibility coefficient calculation.
+- Validated scale quadrature.
+- Backend compatibility changes where required.
+- Arbitrary time-frequency mask reconstruction.
+- Explicit real/analytic-complex reconstruction handling.
+
+Tests:
+
+- Synthesis-response tests.
+- Admissibility constant tests.
+- Direct CWT scale-sum tests.
+- SST conservation tests.
+- Full oscillatory inverse tests.
+- Known-component reconstruction tests.
+- Backend comparisons.
+- Python comparisons.
+- Convergence tests.
+
+Documentation:
+
+- `docs/src/reconstruction_audit.md`
+- `docs/src/wsst_synthesis_theory.md`
+- `docs/src/wsst_backend_validation.md`
+- `docs/src/wsst_component_reconstruction.md`
+
+Examples:
+
+- `examples/standard_inverse.jl`
+- `examples/two_mode_reconstruction.jl`
+- `examples/inverse_convergence.jl`
+
+The completed documentation must explain the difference between standard SST reconstruction, CWT dual-frame reconstruction, and residual-assisted full-input recovery.
+
+## Acceptance criteria
+
+The milestone passes only when:
+
+1. The standard inverse is derived from the selected CWT convention.
+2. The wavelet admissibility constant is independently verified.
+3. The finite synthesis response is measured and its convergence documented.
+4. The standard inverse does not require the original input, retained raw CWT, or an original-signal residual.
+5. The reconstruction factor is correct for both real and analytic-complex inputs.
+6. Complete SST coefficient sums agree with direct CWT scale sums.
+7. Known isolated oscillatory components can be reconstructed from selected SST regions.
+8. The individual-component errors are reported independently of full-signal errors.
+9. The implementation is reproducibly compared against ssqueezepy 0.6.6.
+10. Any retained alternative inverse is explicitly distinguished and documented.
+11. All existing Milestone 03 tests pass, except where the previous expectations were demonstrably based on an incorrect inverse convention; revise such tests with a written mathematical justification.
+12. No new Python runtime dependency is introduced.
+
+## Final engineering rule
+
+Do not optimize for machine-precision full-signal reconstruction at the expense of scientifically correct component extraction.
+
+A standard inverse with controlled, convergent discretization error is preferable to a seemingly exact global inverse whose restricted-band behavior is undefined.
+
+Stop this milestone only after both full oscillatory reconstruction and known-component reconstruction have been independently demonstrated.
+
+## 4. Suggested numerical acceptance tests
+
+I would additionally require the agent to generate a machine-readable validation report with the following metrics.
+
+| Test                             | Expected result                                         | Suggested initial target                                   |
+| -------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------- |
+| Analytic tone frequency          | Exact frequency in reliable interior                    | Error consistent with spectral numerical accuracy          |
+| Complex coefficient conservation | SST sum equals weighted CWT sum                         | Float64 relative error near \\(10^{-12}\\)                 |
+| Standard full inverse            | Reconstruct well-resolved oscillations                  | Relative error below \\(10^{-3}\\), subject to convergence |
+| Analytic complex reconstruction  | Correct amplitude and phase, no erroneous factor of two | Same convergence criterion as real signals                 |
+| Two separated components         | Independently reconstruct each signal                   | Initially below 1% relative error in a well-separated test |
+| Reconstruction bandwidth         | Error varies sensibly with mask width                   | Demonstrate a stable low-error interval                    |
+| Increasing voices per octave     | Improved or convergent quadrature accuracy              | Convergence trend, not necessarily strict monotonicity     |
+| Julia versus Python              | Comparable outputs and reconstruction error             | Explain differences under matched mathematical conventions |
+
+These are starting performance and accuracy targets, not universal guarantees. In particular, the 1% component-error target should be tested on deliberately easy, well-separated signals first. No such guarantee should be asserted for crossing modes.
+
+### One additional test I strongly recommend
+
+Take a synthetic signal consisting of two separated components:
+
+\\[ x(t)=x_1(t)+x_2(t). \\]
+
+Reconstruct both independently using the exact known frequency curves, then compute
+
+\\[ r(t)=x(t)-\widetilde x_1(t)-\widetilde x_2(t). \\]
+
+Report separately:
+
+\\[ \frac{\\|\widetilde x_1-x_1\\|}{\\|x_1\\|}, \qquad \frac{\\|\widetilde x_2-x_2\\|}{\\|x_2\\|}, \qquad \frac{\\|r\\|}{\\|x\\|}. \\]
+
+Also compute the reconstruction of the unselected SST bins. That is the SST-domain residual, which should not be confused with the original-signal difference \\(r\\).
+
+This verifies three different things: each mode is reconstructed correctly, the reconstructed modes explain the original signal, and any omitted synchrosqueezed coefficients are accounted for.
+
+## 5. Reference implementations
+
+The agent should consult these exact resources rather than relying only on documentation summaries:
+
+- [ssqueezepy — WSST and inverse implementation](https://github.com/OverLordGoldDragon/ssqueezepy/blob/master/ssqueezepy/_ssq_cwt.py?utm_source=chatgpt.com). In particular, inspect `ssq_cwt`, `issq_cwt`, and `_invert_components`.&#x20;
+
+  [image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+  GitHub
+
+- [ssqueezepy — coefficient reassignment](https://github.com/OverLordGoldDragon/ssqueezepy/blob/master/ssqueezepy/ssqueezing.py?utm_source=chatgpt.com).
+
+- [ContinuousWavelets.jl — CWT implementation](https://github.com/UCD4IDS/ContinuousWavelets.jl?utm_source=chatgpt.com). Its normalization and discrete-frame construction must be verified against the desired convention.&#x20;
+
+  [image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+  GitHub
+
+  +1
+
+- Daubechies, Lu & Wu (2011), Synchrosqueezed wavelet transforms: An empirical mode decomposition-like tool.
+
+- Thakur, Brevdo, Fučkar & Wu (2013), The Synchrosqueezing algorithm for time-varying spectral analysis: robustness properties and new paleoclimate applications.
+
+For exact reproducibility, the source comparison must use the installed pinned `ssqueezepy==0.6.6` release rather than silently depending on the current GitHub `master` branch.
+
+## 6. Recommended development sequence
+
+Milestone 03 — Completed
+
+First-order WSST, stable phase estimation, reassignment, current inverse implementation and numerical tests.
+
+Milestone 03A — Next
+
+Standard CWT synthesis identity, standard inverse WSST, backend suitability, and known-component reconstruction.
+
+Milestone 04 — Ridge extraction
+
+Dynamic programming, multiridge tracking, crossing behavior, frequency constraints, and ridge-local reconstruction.
+
+Milestone 05 — Higher-order methods
+
+Second-order synchrosqueezing and rapidly evolving frequency trajectories.
+
+The key requirement for Milestone 03A is simple: once a correct WSST has been computed, we must be able to select a frequency band and reconstruct its oscillatory contribution using only the complex coefficients in that band and the known wavelet normalization.
+
+That is the mathematical foundation on which the package's ridge extraction and future BNS mode analysis should be built.

@@ -20,3 +20,4 @@ benchmarks/results/
 
 # Local graph analysis
 graphify-out/GRAPH_REPORT.md
+graphify-out/cache/

@@ -1,8 +1,9 @@
 # API status
 
-Milestone 02 provides a periodic CWT adapter, exact spectral derivative, and
-phase-based frequency estimate. Synchrosqueezing and ridge extraction are not
-implemented yet.
+Milestone 03A provides a periodic standard-compatible CWT adapter, exact
+spectral derivative, first-order WSST reference and fused kernels, scalar
+admissibility inversion, arbitrary masked component reconstruction, and a
+separate finite-bank frame inverse. Ridge extraction remains a later milestone.
 
 ```@docs
 SynchroSqueezing.package_version
@@ -10,11 +11,26 @@ SynchroSqueezing.plan_cwt
 SynchroSqueezing.cwt
 SynchroSqueezing.inverse_cwt
 SynchroSqueezing.instantaneous_frequency
+SynchroSqueezing.linear_frequency_grid
+SynchroSqueezing.log_frequency_grid
+SynchroSqueezing.wsst
+SynchroSqueezing.inverse_wsst
+SynchroSqueezing.reconstruct_region
+SynchroSqueezing.admissibility_constant
+SynchroSqueezing.synchrosqueeze_reference!
+SynchroSqueezing.synchrosqueeze!
 SynchroSqueezing.AbstractCWTBackend
+SynchroSqueezing.AbstractMagnitudeThreshold
+SynchroSqueezing.AbsoluteThreshold
+SynchroSqueezing.NoThreshold
 SynchroSqueezing.ContinuousWaveletsBackend
 SynchroSqueezing.CWTPlan
 SynchroSqueezing.CWTMetadata
 SynchroSqueezing.CWTResult
 SynchroSqueezing.FrequencyEstimate
+SynchroSqueezing.RelativeThreshold
+SynchroSqueezing.ReconstructionConvention
 SynchroSqueezing.WaveletValidation
+SynchroSqueezing.WSSTDiagnostics
+SynchroSqueezing.WSSTResult
 ```

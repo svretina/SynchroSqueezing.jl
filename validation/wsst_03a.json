@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "milestone": "03A",
+  "convention": "analytic_l1",
+  "julia": {
+    "backend": "ContinuousWavelets.jl thin adapter",
+    "boundary": "periodic",
+    "samples": 1024,
+    "sample_rate_hz": 1024.0,
+    "wavelet": {
+      "family": "Morse",
+      "gamma": 3.0,
+      "beta": 20.0,
+      "center_frequency": 1.0
+    },
+    "admissibility": {
+      "analytic": 0.6553434149791622,
+      "log_quadrature": 0.6553434149791609,
+      "relative_difference": 1.863722693003498e-15
+    },
+    "response_at_64_hz": [
+      {"voices_per_octave": 4, "absolute_relative_error": 0.0004421484747184623, "reliable_frequency_range_hz": [2.0, 287.0]},
+      {"voices_per_octave": 8, "absolute_relative_error": 1.5085677151915888e-10, "reliable_frequency_range_hz": [2.0, 318.0]},
+      {"voices_per_octave": 16, "absolute_relative_error": 1.4432899320127035e-15, "reliable_frequency_range_hz": [2.0, 334.0]},
+      {"voices_per_octave": 32, "absolute_relative_error": 1.1102230246251565e-15, "reliable_frequency_range_hz": [2.0, 342.0]}
+    ],
+    "scale_coverage_at_fixed_1024_hz_sample_rate": [
+      {"samples": 128, "reliable_frequency_range_hz": [16.0, 328.0]},
+      {"samples": 256, "reliable_frequency_range_hz": [8.0, 332.0]},
+      {"samples": 512, "reliable_frequency_range_hz": [4.0, 332.0]},
+      {"samples": 1024, "reliable_frequency_range_hz": [2.0, 334.0]}
+    ],
+    "analytic_64_hz_tone_relative_l2_error": 1.084319997287074e-14,
+    "two_real_tones": {
+      "frequencies_hz": [40.0, 96.0],
+      "mask_half_width_hz": 4.0,
+      "component_relative_l2_error": [0.0016578193837037236, 0.0020810341901382067],
+      "combined_relative_l2_error": 0.0015020044630603851,
+      "full_sst_relative_l2_error": 0.00017951138173821334
+    }
+  },
+  "python_reference": {
+    "package": "ssqueezepy",
+    "version": "0.6.6",
+    "numpy_version": "2.3.3",
+    "samples": 512,
+    "sample_rate_hz": 256.0,
+    "boundary": "ssqueezepy default reflection",
+    "admissibility": 0.6553435757496617,
+    "admissibility_relative_difference_from_julia": 2.453180118153174e-7,
+    "standard_inverse_relative_l2_error": 0.00244691755257183,
+    "two_tone_component_relative_l2_error": [0.0759825656607832, 0.06281556111739778],
+    "two_tone_component_interior_relative_l2_error": [0.0014466710103181006, 0.004128784864799483]
+  },
+  "notes": [
+    "SST coefficients are bin-integrated; no output-frequency width is applied during inversion.",
+    "The Julia and Python boundaries and scale extents differ, so analytical errors are compared instead of raw matrix entries.",
+    "Python component errors over all samples include reflected-boundary effects; interior errors omit one eighth at each end."
+  ]
+}

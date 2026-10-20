@@ -1,23 +1,25 @@
 # SynchroSqueezing.jl
 
-`SynchroSqueezing.jl` is a planned pure-Julia package for synchrosqueezed
-time-frequency transforms, frequency-ridge extraction, and oscillatory
-component reconstruction.
+`SynchroSqueezing.jl` is a pure-Julia package under development for
+synchrosqueezed time-frequency transforms, frequency-ridge extraction, and
+oscillatory component reconstruction.
 
-The package is in its foundation phase. Its architecture will reuse mature
-Julia implementations of continuous wavelet transforms and STFTs where they
-are mathematically suitable. The package’s new numerical work will be the
-synchrosqueezing, ridge-tracking, and reconstruction layers.
+Its architecture reuses mature Julia transforms where they are mathematically
+suitable, while keeping synchrosqueezing, reconstruction, and future ridge
+tracking as explicit package layers.
 
 `ContinuousWavelets.jl` is the selected CWT backend. The package includes a
-small periodic adapter with derivative support, metadata validation, and CWT
-inversion; synchrosqueezing itself comes in later milestones.
+periodic adapter with derivative support, metadata validation, first-order
+wavelet synchrosqueezing, residual accounting, and direct WSST inversion.
 
 ## Status
 
-Milestone 02 is complete. The current public API provides a periodic CWT,
-its exact spectral time derivative, a phase-based frequency estimate, and
-full CWT inversion. It does not yet provide an SST or ridge API.
+Milestone 03 is complete. The public API provides a periodic CWT, its exact
+spectral time derivative, stable phase-frequency estimates, nearest and linear
+first-order WSST kernels, and reconstruction for real and analytic complex
+signals. Milestone 03A adds standard scalar-admissibility inversion and
+arbitrary masked component reconstruction. Ridge extraction begins in
+Milestone 04.
 
 See the [roadmap](roadmap/README.md), [numerical conventions](docs/src/conventions.md),
 [dependency audit](docs/src/dependency_audit.md), and [provisional backend

@@ -25,14 +25,19 @@ in Hz. They are `PermutedDimsArray` views of the backend's native
 `time × scale` matrices, so changing the orientation does not copy either
 full matrix.
 
-`result.frequency_weights` contains midpoint-bin widths in Hz for the
-strictly ascending frequency grid. It is retained for later frequency-domain
-quadrature; no SST deposition is implemented yet.
+`result.frequency_weights` contains midpoint-bin widths in Hz.
+`result.squeezing_weights` contains the positive log-frequency quadrature used
+by WSST, and `result.synthesis_response` records the response of the weighted
+sum of the actual backend daughters. Standard-compatible results also store
+the independently computed direct-synthesis `admissibility` constant and the
+measured 1%-error `reliable_frequency_range`.
 
 `result.metadata` records the sample rate and interval, source and padded
 lengths, crop range, boundary choice, backend normalization label, inverse
 style, and exact backend configuration. The current adapter is periodic, so
-the padded length equals the source length and `crop == 1:signal_length`.
+the padded length equals the source length and `crop == 1:signal_length`. The
+source mean is stored separately as `dc_component` and excluded from phase
+reassignment.
 
 `result.valid_rows` flags wavelets whose relative DC response is below the
 requested `dc_tolerance` (default `0.01`). `result.reliability` expands that
@@ -73,5 +78,6 @@ Only `boundary=:periodic` is supported. Reflective and zero-padded modes need
 their own derivative and edge-reliability semantics before they can be exposed.
 Plans are also precision-specific: a Float32 plan accepts Float32 or
 ComplexF32 signals, and likewise for Float64. These explicit constraints keep
-units, layout, and validity behavior predictable while SST algorithms are
-added in later milestones.
+units, layout, and validity behavior predictable. The standard path currently
+supports generalized Morse wavelets; other backend wavelets remain available
+only through the explicitly selected legacy frame path.

@@ -1,8 +1,15 @@
 using Test
 using SynchroSqueezing
+using Random
 
 include("signals.jl")
 include("test_backends.jl")
+include("test_phase.jl")
+include("test_grids.jl")
+include("test_wsst.jl")
+include("test_inverse_wsst.jl")
+include("test_standard_reconstruction.jl")
+include("test_wsst_validation.jl")
 
 @testset "SynchroSqueezing.jl package foundation" begin
     @test SynchroSqueezing.package_version() == v"0.1.0-DEV"

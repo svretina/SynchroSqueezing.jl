@@ -1,0 +1,28 @@
+samples = 2048
+sample_rate_hz = 1024.0
+voices_per_octave = 32
+frequency_min_hz = 15.0
+frequency_max_hz = 160.0
+frequency_bins = 320
+
+[wavelet]
+family = "Morse"
+gamma = 3.0
+beta = 20.0
+center_frequency = 1.0
+
+[oscillator_1]
+amplitude = 1.0
+frequency_hz = 28.0
+modulation_depth = 0.2
+modulation_frequency_hz = 2.0
+
+[oscillator_2]
+amplitude = 0.75
+initial_frequency_hz = 50.0
+chirp_rate_hz_per_second = 15.0
+
+[oscillator_3]
+amplitude = 0.55
+initial_frequency_hz = 140.0
+chirp_rate_hz_per_second = -10.0
