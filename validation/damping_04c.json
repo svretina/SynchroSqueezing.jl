@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "milestone": "04C",
+  "primary_workflow": "analytic ridge reconstruction and exponential damping estimation",
+  "estimators": {
+    "default": "weighted least squares in log-amplitude",
+    "independent": "Gauss-Newton least squares in amplitude space",
+    "local_rate": "negative derivative of log-amplitude"
+  },
+  "verification": {
+    "complex_constant_frequency": true,
+    "real_constant_frequency": true,
+    "linear_chirp": true,
+    "quadratic_chirp": true,
+    "multiple_damping_times": true,
+    "constant_and_growing_amplitudes_flagged": true,
+    "amplitude_modulation_residual_detected": true,
+    "nearby_mode_interference_residual_detected": true,
+    "white_and_colored_noise": true,
+    "amplitude_floor_exclusion": true,
+    "explicit_fit_windows": true,
+    "reconstruction_band_sensitivity": true
+  },
+  "two_damped_oscillator_example": {
+    "samples": 1536,
+    "sample_rate_hz": 512.0,
+    "true_damping_times_seconds": [1.15, 2.2],
+    "estimated_damping_times_seconds": [1.1127694917186723, 2.1448469438825253],
+    "relative_damping_time_error": [0.0323743550272414, 0.02506957096248863],
+    "conditional_fit_standard_error_seconds": [0.0006280556043284543, 0.0015340138433798487],
+    "bandwidth_and_window_sensitivity_range_seconds": [
+      [1.105867706762035, 1.118427559943769],
+      [2.1261666848685725, 2.153581429345107]
+    ],
+    "ridge_rmse_hz": [0.4866738589145817, 0.35083870746673657],
+    "component_relative_l2_error": [0.010382251098603513, 0.009421311799542047],
+    "component_normalized_similarity": [0.9999546487044634, 0.9999676140696623],
+    "summed_reconstruction_relative_l2_error": 0.007102433687105927,
+    "summed_reconstruction_normalized_similarity": 0.9999810449778255,
+    "fit_time_range_seconds": [0.3, 2.55]
+  },
+  "uncertainty_policy": [
+    "Fit standard error is conditional on a selected ridge, band, and time interval.",
+    "Ridge, bandwidth, and fit-window sensitivity is reported separately.",
+    "Inactive, invalid, nonfinite, nonpositive, and below-floor samples are explicitly excluded."
+  ]
+}

@@ -1,0 +1,69 @@
+# Milestone 04 — Extension: Amplitude Envelope and Damping Estimation
+
+## Objective
+
+Extract time-dependent component amplitudes and estimate damping properties from frequency-constrained WSST ridge reconstructions.
+
+## Mathematical quantities
+
+For every reconstructed complex component z_k(t), compute:
+
+- Amplitude envelope A_k(t) = |z_k(t)|.
+- Instantaneous phase φ_k(t) = unwrap(angle(z_k(t))).
+- Optional instantaneous frequency derived from the reconstructed phase.
+- Global exponential damping time τ_k.
+- Optional local damping rate γ_k(t) = −d(log A_k)/dt.
+
+Do not infer damping directly from ridge brightness by default.
+
+## Implementation
+
+1. Preserve complex analytic component reconstruction, even for real-valued input signals.
+2. Implement robust amplitude-envelope extraction.
+3. Implement exponential damping fits using log-amplitude regression.
+4. Support weighted fitting and an explicitly selected fitting window.
+5. Add optional nonlinear least-squares fitting in amplitude space as an independent estimator, especially when envelope noise is appreciable.
+6. Return damping estimates, fit residuals, fit-window metadata, and uncertainty diagnostics.
+7. Reject or flag fits with nonnegative log-amplitude slope when positive damping is required.
+8. Distinguish a fitted constant damping time from a time-dependent local decay rate.
+9. Exclude inactive or unreliable samples according to an explicit policy.
+10. Quantify sensitivity to reconstruction-band width, ridge error, and selected fitting interval.
+
+## Analytical tests
+
+Test known complex and real damped oscillators:
+
+    z(t) = A0 exp(-t/τ) exp(iφ(t))
+
+Use:
+
+- Constant-frequency exponential damping.
+- Linear-chirp exponential damping.
+- Quadratic-chirp exponential damping.
+- Several known damping times.
+- Constant-amplitude signals.
+- Exponentially growing amplitudes.
+- Amplitude-modulated envelopes.
+- Two interfering nearby modes.
+- Additive white and colored noise.
+- Oscillators fading below a known noise floor.
+- Truncated signals and different fitting windows.
+
+Compare:
+
+A. Envelope recovered using the exact known frequency trajectory.
+
+B. Envelope recovered using the extracted ridge.
+
+C. Damping fitted directly to the analytical component.
+
+Report relative damping-time error, amplitude error, phase error, fit residuals, and uncertainty calibration where applicable.
+
+## Acceptance
+
+- Exponential damping times are recovered accurately for well-resolved, isolated, noiseless synthetic signals.
+- Damping estimates converge as scale and reconstruction-band discretizations are refined.
+- Frequency evolution does not systematically bias the damping estimate in the validated test regime.
+- Low-SNR bias and fit-window sensitivity are quantified.
+- Nearby-mode interference is identified as a potential cause of nonexponential envelopes.
+- Reconstruction and damping fit uncertainties are reported separately.

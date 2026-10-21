@@ -10,6 +10,11 @@ include("test_wsst.jl")
 include("test_inverse_wsst.jl")
 include("test_standard_reconstruction.jl")
 include("test_wsst_validation.jl")
+include("test_ridges.jl")
+include("test_predictive_ridges.jl")
+include("test_ridge_reconstruction.jl")
+include("test_damping.jl")
+include("test_mode_support.jl")
 
 @testset "SynchroSqueezing.jl package foundation" begin
     @test SynchroSqueezing.package_version() == v"0.1.0-DEV"

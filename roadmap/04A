@@ -1,0 +1,1180 @@
+# Milestone 04 — Ridge Tracking and Component Reconstruction
+
+Assessment: the milestone is technically sound and appropriately scoped. I would keep its central design: a reliable dynamic-programming ridge tracker, followed by reconstruction of individual oscillatory components from selected WSST coefficients.
+
+However, I would strengthen five aspects before giving it to the development agent:
+
+1. Precisely define the ridge optimization problem. The energy score, continuity penalty, physical units, and treatment of low-energy regions must be explicit. Otherwise, results can change unexpectedly when increasing WSST resolution.
+2. Distinguish global optimal tracking from heuristic tracking. A Viterbi-style dynamic program can find the globally optimal path for its stated objective. Sequential multiridge suppression, by contrast, is a heuristic and does not generally find an optimal set of ridges.
+3. Separate tracking from component reconstruction. A correctly identified frequency trajectory does not guarantee an accurately reconstructed waveform. The frequency band surrounding the ridge is an independent modeling choice.
+4. Introduce explicit absence and ambiguity handling. A ridge tracker should not silently report a physical mode in a time interval where the mode disappears, overlaps another mode, or becomes indistinguishable from noise.
+5. Make refinement independent of frequency-grid density. Since you've already increased your output resolution from 160 to 320 bins, physical-frequency penalties and bandwidths should produce comparable results at both resolutions.
+
+The original milestone aligns well with approaches used in `ssqueezepy` and MATLAB's `wsstridge`, which combine ridge energy with frequency-continuity penalties. `ssqueezepy` also uses sequential exclusion bands for multiridge extraction.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
++1
+
+
+
+There are important improvements we can make without substantially expanding the milestone.
+
+## 1. The mathematical problem we want to solve
+
+Let the WSST matrix be
+
+\\[ T\_{j,n}=T(f_j,t_n), \\]
+
+with frequencies \\(f_j\\) in Hz and times \\(t_n\\) in seconds.
+
+A ridge is a sequence of frequency-bin indices,
+
+\\[ r=(r_1,r_2,\ldots,r\_{N_t}), \\]
+
+whose physical frequencies are
+
+\\[ f_r(t_n)=f\_{r_n}. \\]
+
+We want a trajectory that passes through strong time-frequency coefficients while varying smoothly enough to correspond to a physical oscillation.
+
+### Recommended objective
+
+Use
+
+\\[ \boxed{ r^\*=\underset{r}{\operatorname{argmin}} \left[ \sum\_{n=1}^{N_t}D(r_n,n) + \sum\_{n=2}^{N_t} \lambda_n \left( \frac{q(f\_{r_n})-q(f\_{r\_{n-1}})}{\sigma_n} \right)^2 \right]. } \\]
+
+Here:
+
+- \\(D(j,n)\\) is the local observation cost.
+- \\(q(f)=f\\) gives physical-frequency continuity.
+- \\(q(f)=\log f\\) gives logarithmic-frequency continuity.
+- \\(\sigma_n\\) provides a frequency-change scale.
+- \\(\lambda_n\\) controls smoothness.
+
+For uniform sampling, it is simplest to choose constant \\(\lambda\\) and \\(\sigma\\). For nonuniform sampling, the transition cost should account explicitly for \\(\Delta t_n=t_n-t\_{n-1}\\).
+
+The important thing is that the penalty acts on physical frequency coordinates, not merely the difference between bin indices.
+
+For example, penalizing \\((r_n-r\_{n-1})^2\\) would make the same 2 Hz change four times more expensive when the output grid spacing is halved. We should avoid that unintended dependence.
+
+A suitable observation cost is
+
+\\[ D(j,n)= -\log\left( \frac{|T\_{j,n}|^2}{E\_{\mathrm{ref},n}}+\epsilon \right), \\]
+
+with documented zero handling and a scale-aware reference. This is similar to the negative-log-energy formulation used by Python's ridge extraction.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
+
+
+I would also add a hard jump-rate constraint:
+
+\\[ \left| \frac{f\_{r_n}-f\_{r\_{n-1}}}{\Delta t_n} \right| \le J\_{\max}, \\]
+
+where \\(J\_{\max}\\) is expressed in Hz/s.
+
+This is especially useful for synthetic tests and BNS applications where reasonable chirp rates can be estimated.
+
+One subtlety: an energy-maximizing path will still follow noise if the actual mode disappears. To avoid presenting those regions as physically reliable detections, we need a separate activity or validity criterion.
+
+## 2. The DP recurrence
+
+For each frequency bin \\(j\\) at time \\(n\\), define \\(C_n(j)\\) as the minimum accumulated cost of any valid path ending at that bin.
+
+Initialize
+
+\\[ C_1(j)=D(j,1). \\]
+
+Then compute
+
+\\[ \boxed{ C_n(j)=D(j,n)+ \min\_{k\in\mathcal A_n(j)} \left[ C\_{n-1}(k)+P_n(k,j) \right]. } \\]
+
+Here \\(\mathcal A_n(j)\\) is the set of admissible predecessor bins, and
+
+\\[ P_n(k,j)= \lambda \left( \frac{q(f_j)-q(f_k)}{\sigma} \right)^2 \\]
+
+is the continuity penalty.
+
+Store the minimizing predecessor for every state.
+
+After processing the final time sample, choose the minimum-cost final state and backtrack to obtain the optimal path.
+
+This is the standard Viterbi-style dynamic program for a first-order trajectory model. With a fixed cost function and admissible transitions, it gives the global optimum of that discrete problem.
+
+I strongly recommend making this recurrence the canonical specification. The optimized algorithms must reproduce its answer exactly, not merely produce a visually similar ridge.
+
+## 3. Refined agent-ready milestone
+
+# Milestone 04 — Ridge Tracking and Component Recovery
+
+## Objective
+
+Implement accurate, deterministic, physically interpretable ridge extraction from the first-order WSST, followed by reconstruction of individual oscillatory components.
+
+The implementation must:
+
+- Identify continuous instantaneous-frequency trajectories.
+- Recover weak and strong modes without unnecessarily switching between them.
+- Respect physical frequency coordinates, sample times, and user-supplied constraints.
+- Support full and restricted-band inverse WSST reconstruction.
+- Guarantee that component ownership does not duplicate complex SST coefficients.
+- Quantify uncertainty and ambiguity in low-energy regions, crossings, and overlapping modes.
+- Remain accurate when frequency-grid resolution changes.
+
+This milestone builds on the completed and validated Milestones 03 and 03A. Reuse their frequency-grid abstractions, standardized reconstruction conventions, numerical kernels, metadata, and testing infrastructure.
+
+The milestone does not implement second-order synchrosqueezing, general joint multi-target optimization, or GPU execution.
+
+---
+
+## Phase 1 — Inspect the existing package and define interfaces
+
+Before implementation, inspect:
+
+- WSST result types and metadata.
+- Frequency grids and coordinate access.
+- Threshold and validity masks.
+- Standard inverse WSST.
+- Existing examples and synthetic signal generators.
+- ContinuousWavelets.jl integration.
+- The pinned Python reference environment.
+
+Define the following conceptual interfaces:
+
+```
+extract_ridge(T, freqs; times, config, valid_mask)
+extract_ridges(T, freqs; times, n_ridges, config)
+reconstruct_component(result, ridge; bandwidth, ...)
+reconstruct_components(result, ridges; ownership, ...)
+ridge_metrics(estimated, truth; ...)
+component_metrics(reconstructed, truth; ...)
+```
+
+Prefer typed configuration objects over a large collection of loosely related keyword parameters.
+
+A possible API:
+
+```
+RidgeConfig(
+    observation = LogEnergyCost(),
+    continuity = PhysicalFrequency(),
+    penalty = ...,
+    max_rate = ...,
+    frequency_range = ...,
+    prior = nothing,
+    ...
+)
+```
+
+Return typed results containing at least:
+
+- Ridge indices.
+- Frequencies in Hz.
+- Time coordinates.
+- Validity and activity flags.
+- Local energy or score.
+- Total path cost.
+- Parameters and relevant solver metadata.
+
+Explicitly identify valid versus invalid ridge indices; do not use an arbitrary real frequency such as zero to indicate missing data.
+
+Do not expose a representation that becomes ambiguous on logarithmic, nonuniform, or user-defined frequency grids.
+
+## Phase 2 — Maximum-energy baseline
+
+Implement a simple reference tracker:
+
+```
+r[n] = argmax_j abs2(T[j, n])
+```
+
+Apply the allowed frequency range and input validity masks.
+
+Provide deterministic tie handling, choosing the lowest-frequency eligible bin unless explicitly configured otherwise.
+
+Return an invalid result if no admissible bin exists at a time sample.
+
+This baseline is essential for measuring whether dynamic programming improves tracking.
+
+Tests:
+
+1. Constant-frequency ridge.
+2. Moving ridge.
+3. Two intersecting energy structures.
+4. Temporarily weaker true mode.
+5. Exactly tied frequency bins.
+6. Entirely zero columns.
+7. Frequency restrictions and validity masks.
+8. NaN and Inf input handling according to the documented policy.
+
+For a single isolated high-energy component, the maximum-energy baseline should be accurate without continuity penalties.
+
+## Phase 3 — Define the dynamic-programming objective
+
+Implement first-order global path optimization.
+
+For a path r[n], minimize:
+
+```
+J(r) = Σ_n D(r[n], n)
+       + Σ_{n=2}^Nt P(r[n-1], r[n], Δt[n])
+```
+
+Define the observation cost using a regularized negative log of squared coefficient magnitude:
+
+```
+D(j,n) = -log(E(j,n)/Eref(n) + epsilon)
+```
+
+where:
+
+```
+E(j,n) = abs2(T[j,n])
+```
+
+Choose and document the reference-energy convention.
+
+Support per-time normalization as the initial default to improve numerical scaling. Preserve absolute signal-strength information separately so activity detection is not defeated by normalizing every column independently.
+
+Treat zero-energy columns explicitly; do not allow tiny floating-point denominators to create NaN costs.
+
+Add the following continuity coordinates:
+
+1. Physical frequency: q(f) = f.
+2. Log frequency: q(f) = log(f), requiring f > 0.
+
+Suggested transition cost:
+
+```
+P(k,j,Δt) = λ [ (q(f[j])-q(f[k])) / σ(Δt) ]²
+```
+
+The user must be able to configure a physically meaningful penalty scale.
+
+Define a time-step convention and state it precisely. One option is σ(Δt)=s × Δt for a derivative-normalized penalty, where s is a characteristic rate in Hz/s (or inverse seconds for log-frequency rate). Another is a fixed reference-step penalty appropriately rescaled for nonuniform time samples.
+
+Do not automatically mix these interpretations.
+
+Provide a hard physical jump-rate constraint:
+
+```
+abs(f[j]-f[k]) / Δt <= max_rate
+```
+
+with max_rate measured in Hz/s.
+
+If logarithmic-rate constraints are provided, expose them as a distinct option with corresponding units.
+
+Physical jump constraints and the continuity penalty must remain independent of frequency-bin density.
+
+Check parameter units, positivity, finite values, strictly ascending frequency grids, strictly increasing times, and incompatible configuration choices.
+
+## Phase 4 — Reference dynamic programming
+
+Implement a simple, easily auditable recurrence:
+
+```
+C[1,j] = D(j,1) + initial_prior(j)
+
+C[n,j] = D(j,n) +
+         min_k (C[n-1,k] + P(k,j,Δt[n]))
+```
+
+where forbidden states and transitions have infinite cost.
+
+Store integer predecessors and recover the globally optimal path by backtracking.
+
+Support configurable start and end priors, including unrestricted endpoints.
+
+Define deterministic tie-breaking for equal-cost paths and require all solvers to implement the same rule.
+
+Handle:
+
+- No valid initial state.
+- No feasible transition.
+- Unreachable terminal states.
+- One-time-sample matrices.
+- One-frequency-bin matrices.
+- Uniform and nonuniform grids.
+- Nonuniform time coordinates.
+- Float32 and Float64.
+- Large but finite costs.
+
+Use O(Nf × Nt) predecessor storage and O(Nf) rolling cost vectors unless a documented implementation requirement justifies storing the full cost matrix.
+
+The dense reference implementation may cost O(Nt × Nf²).
+
+Prioritize transparency and correctness over performance.
+
+## Phase 5 — Independent exhaustive verification
+
+For very small time-frequency matrices, enumerate every admissible path and compute its objective independently.
+
+Compare:
+
+- Global optimum cost.
+- Path indices.
+- Hard-constraint satisfaction.
+- Tie-breaking behavior.
+- Infeasible-case handling.
+
+Include adversarial matrices where:
+
+1. Greedy local selection fails.
+2. The best path begins at a weaker state.
+3. The best path temporarily passes through weak energy.
+4. Multiple paths have equal cost.
+5. The jump constraint forbids an otherwise attractive path.
+6. A prior changes the optimal trajectory.
+7. A frequency grid is highly irregular.
+
+Use randomized small matrices with fixed seeds.
+
+The DP implementation must agree with exhaustive enumeration, including deterministic ties.
+
+Do not validate the reference solver solely against another DP implementation.
+
+## Phase 6 — Banded dynamic programming
+
+Implement a configurable restriction on admissible transitions.
+
+Banded transitions may be defined by:
+
+- Maximum physical frequency jump.
+- Maximum physical frequency-change rate.
+- Maximum log-frequency change.
+- A maximum number of bins, explicitly described as a grid-dependent performance option.
+
+The default scientific interface should use physical units.
+
+Avoid assuming that a fixed bin radius corresponds to a fixed physical frequency range.
+
+Construct admissible predecessor intervals efficiently on sorted frequency grids.
+
+Require banded DP to match dense DP when both represent the same transition constraints.
+
+Test performance as a function of grid size and permitted transition width.
+
+If the band is an approximation rather than an exact encoding of a physical constraint, document it and expose the approximation distinctly.
+
+## Phase 7 — Optional exact quadratic-distance-transform solver
+
+Investigate a linear-time or near-linear-time optimization for the quadratic transition penalty:
+
+```
+min_k [ Cprev(k) + λ(q[j]-q[k])² ]
+```
+
+Use this only if the regularity conditions are satisfied.
+
+The optimization must:
+
+- Preserve the exact discrete objective.
+- Operate on a regular grid in q(f), unless a separately verified irregular-coordinate algorithm is used.
+- Handle numerical precision reliably.
+- Reproduce the reference DP's tie-breaking.
+- Fall back to the reference or banded DP when unsupported restrictions are present.
+
+A regular logarithmic-frequency grid is regular in log-frequency coordinates, not necessarily in physical frequency.
+
+A uniformly spaced frequency grid is regular in Hz, not necessarily in log frequency.
+
+Do not assume that the presence of a quadratic penalty alone is sufficient to use the optimization.
+
+In particular, finite allowed-jump intervals, predecessor-specific constraints, and general transition priors may require a different exact algorithm or fallback.
+
+Use an optimization only after exhaustive and randomized equivalence tests pass.
+
+Benchmark the optimization separately.
+
+## Phase 8 — Frequency priors and constrained tracking
+
+Support hard constraints:
+
+- Minimum and maximum frequency.
+- Time-dependent allowable frequency region.
+- Optional hard prior envelope.
+- Maximum frequency-change rate.
+- Reliable interior-time mask.
+
+Support soft constraints:
+
+- Optional reference frequency trajectory.
+- Optional prior tolerance.
+- Optional penalty for deviation from the reference curve.
+
+Suggested soft prior:
+
+```
+Dprior(j,n) = λprior ×
+              ((q(f[j])-q(fprior[n]))/σprior[n])²
+```
+
+Document whether the prior is expressed in physical or log frequency.
+
+Do not conflate an imposed prior trajectory with a frequency measurement.
+
+Return metadata identifying where strong priors, not data, determined the reported trajectory.
+
+Test zero-strength priors, strong priors, incorrect priors, and missing prior values.
+
+Do not quietly snap a prior to a prohibited or absent bin.
+
+## Phase 9 — Ridge activity, gaps, and boundaries
+
+A global DP normally returns a state at every time sample, even when no physical component is present.
+
+Implement an explicit distinction between:
+
+- A mathematically optimized path.
+- A sufficiently supported physical ridge observation.
+- A low-confidence or inactive interval.
+- An excluded boundary interval.
+
+Start with post-tracking activity masks derived from local SST evidence.
+
+Possible evidence includes:
+
+- Absolute coefficient magnitude.
+- Relative coefficient magnitude.
+- Local peak prominence.
+- Energy contrast against a defined background.
+- Consistency of the candidate ridge with surrounding frequency-band structure.
+
+Do not interpret a heuristic score as a calibrated statistical probability.
+
+Provide a clear policy for missing intervals:
+
+- Mark the ridge inactive.
+- Optionally interpolate frequency for visualization only.
+- Do not label interpolated values as measured.
+- Exclude inactive samples from frequency-error statistics.
+- Do not silently synthesize an oscillatory component from a ridge-only extrapolation.
+
+Explicit birth/death-state modeling or globally optimal gap transitions are optional, not mandatory for this milestone. If added, define their objective and validate it with exhaustive cases.
+
+Expose boundary/reliability masks from the underlying WSST.
+
+The tracker must not silently treat boundary artifacts as equally trustworthy as valid interior coefficients.
+
+## Phase 10 — Sequential multi-ridge extraction
+
+Implement a first version that repeatedly:
+
+1. Finds the best ridge.
+2. Marks a suppression region around the selected path.
+3. Repeats on the remaining admissible states.
+
+Allow suppression bandwidth in:
+
+- Number of bins.
+- Physical Hz.
+- Relative or logarithmic frequency width.
+
+Use the actual frequency coordinates when constructing physical suppression regions.
+
+Do not mutate the input SST matrix or original coefficient values.
+
+Store exclusion masks separately.
+
+A suppressed frequency bin must become ineligible for subsequent tracking rather than merely having its energy set to zero.
+
+Support deterministic ordering by selection order and report ridge strength separately.
+
+Explicitly document that sequential suppression is heuristic and does not guarantee a globally optimal set of ridges.
+
+At crossings, the algorithm may:
+
+- Exchange physical identities.
+- Terminate an otherwise valid path.
+- Suppress another component.
+- Follow the strongest component rather than the desired one.
+
+Do not claim successful physical mode identification solely because continuous paths are returned.
+
+Test extraction order and suppression-width sensitivity.
+
+## Phase 11 — Component reconstruction from ridge bands
+
+Use the standard inverse WSST established in Milestone 03A.
+
+Given a ridge frequency f_r(t), construct a mask in the SST frequency-time plane.
+
+Support:
+
+1. Fixed bin-count half-width.
+2. Fixed Hz half-width.
+3. Optional relative/log-frequency half-width.
+4. A custom supplied frequency-time mask.
+
+Document whether boundaries are inclusive.
+
+Reconstruct exclusively from selected complex SST coefficients.
+
+For bin-integrated SST coefficients:
+
+```
+S_component[n] = Σ_j M[j,n] T[j,n]
+```
+
+Apply the correct standard inverse normalization.
+
+Do not insert an extra frequency-bin-width factor.
+
+Support reconstruction of:
+
+- One component.
+- Multiple components.
+- The complete represented oscillatory signal.
+- Unassigned SST coefficients.
+
+Do not require the original input or CWT coefficients for component reconstruction.
+
+Retain explicit DC and excluded-coefficient handling from Milestone 03A, but do not silently allocate these contributions to oscillatory components.
+
+## Phase 12 — Overlap ownership and residual consistency
+
+Two ridge bands may select the same SST bin.
+
+Simply summing both bands would double-count its complex coefficient.
+
+Implement at least two ownership policies:
+
+1. Exclusive nearest-ridge assignment within eligible bands.
+2. Fractional partition of overlapping bins with nonnegative weights.
+
+For each frequency-time bin, define ownership weights α_k(j,n) for components k and a residual weight α_res(j,n).
+
+Require:
+
+```
+α_k(j,n) >= 0
+α_res(j,n) >= 0
+
+Σ_k α_k(j,n) + α_res(j,n) = 1
+```
+
+Then define:
+
+```
+T_k(j,n) = α_k(j,n) T(j,n)
+
+T_res(j,n) = α_res(j,n) T(j,n)
+```
+
+This guarantees complex coefficient conservation:
+
+```
+Σ_k T_k + T_res = T
+```
+
+and ensures no double counting.
+
+The simplest default should be exclusive nearest-ridge ownership, with deterministic tie handling.
+
+Fractional ownership may help represent overlap smoothly but must not be presented as physically unique mode separation.
+
+Make component masks and ownership weights inspectable in the result.
+
+Verify that component and residual synthesis sums reproduce the full standard SST synthesis within floating-point tolerance.
+
+Distinguish the SST-domain residual from any low-frequency or rejected-coefficient residual maintained elsewhere.
+
+## Phase 13 — Reconstruction bandwidth study
+
+The optimal ridge path is not necessarily the optimal reconstruction band.
+
+A very narrow band may discard valid component coefficients.
+
+A very wide band may include coefficients from other components.
+
+Conduct bandwidth sweeps for known components.
+
+Measure:
+
+- Reconstruction error versus bandwidth.
+- Amplitude bias.
+- Phase error.
+- Cross-component contamination.
+- Unassigned coefficient fraction.
+- Dependence on wavelet bandwidth and frequency resolution.
+
+Begin with fixed Hz bandwidth and fixed-bin bandwidth.
+
+A data-adaptive reconstruction band may be investigated if fixed bands are clearly insufficient, but it should be added only with an independently verifiable rule and analytical tests.
+
+Do not infer optimal bandwidth from visual appearance alone.
+
+## Phase 14 — Independent ridge tests
+
+Test the ridge solvers on synthetic time-frequency matrices before applying them to actual WSST outputs.
+
+Construct analytical ridge paths with tunable:
+
+- Frequency slope.
+- Frequency curvature.
+- Ridge width.
+- Ridge amplitude.
+- Competing ridge amplitude.
+- Background noise.
+- Missing time intervals.
+- Crossing angle.
+- Frequency separation.
+
+This isolates the path optimization from wavelet-transform errors.
+
+For each test, compare:
+
+- Maximum-energy baseline.
+- Dense DP.
+- Banded DP.
+- Quadratic optimized DP where supported.
+
+Required cases:
+
+1. Single stationary ridge.
+2. Smooth chirp.
+3. Abrupt but permitted change.
+4. Abrupt forbidden change.
+5. Temporarily weak ridge.
+6. Two separated ridges.
+7. Two crossing ridges.
+8. Completely missing ridge interval.
+9. Incorrect prior trajectory.
+10. Strong competing ridge.
+11. Irregular frequency grid.
+12. Changed output frequency resolution.
+13. All-zero and low-energy columns.
+14. Boundary-excluded time samples.
+
+The reference DP must match brute force on small cases.
+
+All optimized solvers must reproduce the reference objective and path under documented conditions.
+
+## Phase 15 — End-to-end physical-signal tests
+
+Use the existing synthetic signal infrastructure from Milestones 03 and 03A.
+
+Test:
+
+- One complex tone.
+- One real tone.
+- Two separated tones.
+- Three separated tones.
+- Parallel chirps.
+- Oppositely evolving chirps.
+- Crossing chirps.
+- Quadratic and exponential chirps.
+- Amplitude-modulated modes.
+- Time-limited modes.
+- Unequal-amplitude modes.
+- Additive noise at several SNR values.
+- BNS-like post-merger mixtures with a dominant mode and weaker secondary frequencies.
+
+For each component with known ground truth, compute:
+
+- Instantaneous-frequency RMSE.
+- Bias and maximum frequency error.
+- Ridge coverage.
+- Amplitude error.
+- Phase error.
+- Relative waveform reconstruction error.
+- Signal-to-reconstruction-error ratio (SRER).
+- Cross-mode leakage.
+- Residual waveform norm.
+- SST ownership and excluded-coefficient fractions.
+
+Separate:
+
+A. Results from known true ridge trajectories.
+
+B. Results from automatically extracted ridge trajectories.
+
+This separates reconstruction error from ridge-tracking error.
+
+Match extracted ridges to physical ground-truth components using a documented assignment procedure; do not silently reorder modes based on whichever correspondence gives the most flattering local results.
+
+For crossings, report identity swaps explicitly.
+
+## Phase 16 — Numerical definitions and evaluation conventions
+
+Define frequency RMSE on the set of valid samples Ω:
+
+```
+RMSE_f = sqrt(mean((f_est[n]-f_true[n])² for n in Ω))
+```
+
+Report coverage separately:
+
+```
+coverage = |Ω| / N_expected
+```
+
+Do not reduce RMSE merely by marking difficult samples invalid.
+
+Define relative reconstruction error:
+
+```
+Erel = norm(xrec-xtrue) / norm(xtrue)
+```
+
+Define:
+
+```
+SRER = 10 log10(
+    sum(abs2, xtrue) /
+    sum(abs2, xrec-xtrue)
+)
+```
+
+Use dB for SRER.
+
+For phase error, use an explicitly documented phase convention and compare only where the reference amplitude is sufficiently large for phase to be meaningful.
+
+For real signals, use a consistent analytic-signal or phase-estimation convention.
+
+For complex signals, distinguish phase error from a constant global phase offset; report both raw and globally phase-aligned metrics if alignment is allowed.
+
+Do not allow hidden amplitude or phase fitting in the primary reconstruction-error metric.
+
+Define residual metrics separately for:
+
+- Unassigned SST complex coefficients.
+- Reconstructed unassigned oscillatory waveform.
+- Actual difference between full-input signal and summed reconstructions.
+- DC and other contributions outside oscillatory WSST reconstruction.
+
+Do not refer to all of these as the same residual.
+
+Use coefficient mass or norm descriptors precisely. Squared magnitudes of SST bins are not automatically conserved physical signal energy.
+
+## Phase 17 — Python comparison
+
+Inspect the pinned ssqueezepy 0.6.6 ridge extraction implementation.
+
+Compare:
+
+- Observation cost.
+- Physical versus log-frequency penalty.
+- Penalty scaling.
+- Forward/backtracking behavior.
+- Sequential suppression.
+- Reconstruction-band selection.
+
+Run both implementations on identical precomputed matrices.
+
+Match mathematical settings wherever possible.
+
+Do not demand identical paths where algorithms deliberately optimize different objectives.
+
+Our Julia DP must be validated primarily against its exact objective and brute-force solution.
+
+The Python implementation serves as an independent comparison and benchmark, not as an overriding mathematical authority.
+
+Keep Python as a test-only dependency.
+
+## Phase 18 — Performance
+
+Benchmark independently:
+
+- Maximum-energy baseline.
+- Dense DP.
+- Banded DP.
+- Optional quadratic optimized DP.
+- Sequential multiridge extraction.
+- Mask construction.
+- Complex component reconstruction.
+
+Report runtime and allocations versus:
+
+- Number of frequency bins.
+- Number of time samples.
+- Allowed transition bandwidth.
+- Number of requested ridges.
+- Float32 versus Float64.
+
+Avoid constructing a dense Nf × Nf transition matrix in the standard banded implementation.
+
+Keep reference code simple; optimize production code only after correctness is established.
+
+Do not add a broad optimization package merely to reproduce a short Viterbi recurrence.
+
+## Documentation and examples
+
+Create documentation covering:
+
+1. Ridge extraction theory.
+2. DP objective and parameter units.
+3. Physical-frequency versus log-frequency penalties.
+4. Dense, banded, and optimized solver selection.
+5. Ridge activity and boundary handling.
+6. Sequential multiridge limitations.
+7. Reconstruction masks and bandwidth.
+8. Overlap ownership and residual semantics.
+9. Mode ambiguity at crossings.
+10. Parameter tuning and computational scaling.
+
+Create examples:
+
+- Single chirp: greedy versus DP.
+- Two separated chirps: reconstruction.
+- Three oscillators: comparison with known truth.
+- Crossing chirps: identity ambiguity.
+- BNS-like synthetic waveform: dominant and weak secondary modes.
+- Grid-resolution comparison: 160 versus 320 versus 640 frequency bins.
+
+Include diagnostic figures with identical axes and color scales where comparisons are made.
+
+## Acceptance gate
+
+This milestone is complete when:
+
+1. The single-ridge DP objective is explicitly defined and documented.
+2. Dense DP agrees with exhaustive path enumeration on small cases.
+3. Banded DP agrees with dense DP when solving equivalent admissible-transition problems.
+4. Any optimized quadratic solver agrees with the reference implementation on all supported configurations.
+5. Ridge tracking is deterministic.
+6. Physical penalties and bandwidths behave consistently under frequency-grid refinement.
+7. Known synthetic ridges are recovered with quantified frequency and coverage errors.
+8. Known components are reconstructed from restricted SST regions with quantified waveform, amplitude, and phase errors.
+9. Component ownership prevents double counting.
+10. Component plus residual synthesis reproduces the complete represented SST synthesis.
+11. Missing/ambiguous regions are reported, not silently certified.
+12. Crossings and overlapping modes are explicitly documented as limitations.
+13. Existing Milestone 03 and 03A functionality remains correct.
+14. Documentation, examples, tests, and benchmarks pass.
+
+Do not accept results based solely on visually smooth ridges.
+
+The milestone succeeds when it produces reproducible, physically interpretable trajectories and independently validated component reconstructions.
+
+## 4. Important design decisions
+
+There are three decisions I would settle now rather than leaving them to the agent.
+
+### Decision A — Use global DP as the scientific default
+
+There is a subtle distinction between two implementations.
+
+`ssqueezepy` implements a forward-backward ridge tracking algorithm based on negative-log normalized energy and a quadratic continuity penalty. Its source is a useful reference, but our goal should be an explicitly defined global discrete-path optimum, independently verified by brute force.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://github.com\&sz=32)
+
+GitHub
+
+
+
+The recommended hierarchy is:
+
+| Algorithm                    | Role                                                       | Complexity                  |
+| ---------------------------- | ---------------------------------------------------------- | --------------------------- |
+| Maximum-energy per column    | Baseline                                                   | \\(O(N_tN_f)\\)             |
+| Dense DP                     | Correctness reference                                      | \\(O(N_tN_f^2)\\)           |
+| Banded DP                    | Default production method when transitions are constrained | \\(O(N_tN_fB)\\)            |
+| Quadratic distance transform | Optional optimization when assumptions hold                | Potentially \\(O(N_tN_f)\\) |
+
+Here \\(B\\) is the maximum number of allowed predecessor bins per state.
+
+Use banded DP as the initial production implementation, with a configurable physical jump-rate limit. It is relatively simple, efficient, and sufficient for the anticipated signal sizes.
+
+The quadratic-distance-transform optimization should remain optional. We should not spend disproportionate development effort on it before establishing reconstruction quality.
+
+### Decision B — Use physical frequency as the default coordinate
+
+Your package supports linear, logarithmic, and arbitrary frequency grids.
+
+The tracker should not depend on the grid parameterization unless explicitly requested.
+
+For the BNS analysis, I recommend initially using
+
+\\[ q(f)=f,\qquad P(k,j)=\lambda \left(\frac{f_j-f_k}{\sigma_f}\right)^2, \\]
+
+with a separately configured physical maximum frequency-change rate.
+
+This makes parameter interpretation straightforward.
+
+Log-frequency penalties remain useful when tracking oscillations spanning several octaves, but I would not make them the default for post-merger modes occupying a relatively restricted physical band.
+
+### Decision C — Do not automatically fit reconstruction bands from the ridge
+
+A ridge gives an estimate of instantaneous frequency:
+
+\\[ f_k(t). \\]
+
+It does not uniquely determine how much of the time-frequency plane belongs to that physical component.
+
+The reconstruction bandwidth must be treated as a distinct parameter.
+
+For initial tests, I recommend
+
+\\[ B_k(t)= [f_k(t)-\Delta f_k,\ f_k(t)+\Delta f_k]. \\]
+
+Then sweep \\(\Delta f_k\\) while measuring reconstruction errors against known synthetic components.
+
+This allows us to quantify whether a poorly reconstructed mode is caused by inaccurate tracking or an inadequate reconstruction band.
+
+For actual numerical-relativity waveforms, where the component ground truth is not known, reconstruction-band sensitivity becomes an important systematic uncertainty.
+
+## 5. Specific numerical experiments I would prioritize
+
+Experiment 1 — Why DP is better than greedy
+
+Construct two ridges whose amplitudes alternate, while their frequencies remain well separated. The column-wise maximum will jump between them; the DP should remain on one trajectory when continuity constraints justify it.
+
+Test this entirely on a synthetic time-frequency matrix before involving the CWT.
+
+Experiment 2 — What happens at a crossing?
+
+Construct two chirps crossing at a known time. Test whether sequential extraction exchanges their identities.
+
+A continuous output trajectory is not sufficient evidence of correct tracking. Record the fraction of time assigned to the correct physical component and the number of identity swaps.
+
+Experiment 3 — Ridge accuracy versus waveform reconstruction
+
+First reconstruct a component using its known analytical frequency trajectory. Then reconstruct it using the extracted ridge.
+
+The difference in reconstruction error isolates the effect of ridge estimation, holding the band-selection rule fixed.
+
+Experiment 4 — Grid invariance
+
+Use 160, 320, and 640 output frequency bins, while maintaining the same signal and physical penalties.
+
+Frequency RMSE and reconstructed components should converge, rather than changing drastically because the bin width changed.
+
+## 6. Should we implement more sophisticated multiridge tracking now?
+
+Not yet.
+
+The sequential approach in your original milestone is sensible as a first implementation. More elaborate joint multi-ridge optimization could address some identity-switching and exclusion failures, but it also introduces a substantially harder optimization problem.
+
+The ridge-extraction literature identifies mode selection and separation as nontrivial problems even when time-frequency representations are well concentrated.&#x20;
+
+[image](https://www.google.com/s2/favicons?domain=https://www.sciencedirect.com\&sz=32)
+
+ScienceDirect
+
+
+
+I would therefore keep:
+
+- A fully verified single-ridge global optimizer.
+- Sequential multiridge extraction.
+- Explicit mode identity and crossing diagnostics.
+- Independent component reconstruction.
+
+Then use the test results to determine whether joint tracking is actually necessary.
+
+### Final recommendation
+
+Approve Milestone 04 with the refinements above. The strongest additions are physical-unit continuity penalties, rigorous DP correctness tests, handling of inactive intervals, and a mathematically explicit partition of complex SST coefficients among reconstructed components.
+
+I would make the development sequence:
+
+Reference DP → Banded DP → Synthetic multiridge tracking → Component reconstruction → Ownership/residual verification → Convergence/performance → Optional quadratic optimization.
+
+One final priority for your research: BNS post-merger signals contain multiple frequency trajectories whose relative amplitudes can evolve substantially. The ability to follow a weaker but physically consistent mode may ultimately matter more than finding the globally strongest ridge. This milestone should establish that capability before introducing second-order synchrosqueezing.
+
+That simplifies Milestone 04 considerably and makes the approach better suited to our BNS post-merger application.
+
+We should implement frequency-constrained ridge extraction as the primary method, rather than attempting to discover all ridges across the entire WSST.
+
+The scientific assumption is that we have prior knowledge of the approximate frequency interval occupied by each physical mode, but we do not know its precise frequency evolution.
+
+For example, we might supply:
+
+```
+ridge1 = extract_ridge(wsst_result; freqrange=(1500.0, 2500.0))
+ridge2 = extract_ridge(wsst_result; freqrange=(2500.0, 3500.0))
+```
+
+These ranges are illustrative, not universal BNS mode-frequency bounds.
+
+## How this changes Milestone 04
+
+The DP will operate only on the permitted frequency bins:
+
+\\[ \mathcal F=\\{j:f\_{\min}\le f_j\le f\_{\max}\\}. \\]
+
+The optimal trajectory becomes
+
+\\[ \boxed{ r^\*=\arg\min\_{r_n\in\mathcal F} \left[ \sum_n D(r_n,n) +\lambda\sum\_{n=2}^{N_t} \left(\frac{f\_{r_n}-f\_{r\_{n-1}}}{\sigma_f}\right)^2 \right]. } \\]
+
+The frequency interval is a hard constraint, not a soft preference. No estimated ridge may leave it.
+
+This has several advantages:
+
+- A strong unrelated mode outside the interval cannot attract the tracker.
+- Weak secondary modes become easier to follow because they are not competing with the entire spectrum.
+- The DP operates on fewer frequency bins, improving performance.
+- We do not need elaborate automatic mode discovery.
+- Tracking parameters can be tailored to the expected physical behavior of each mode.
+
+## Revised agent instructions
+
+# Milestone 04 — Updated Frequency-Constrained Ridge Tracking Requirements
+
+The following requirements supersede the corresponding ridge-discovery and multi-ridge provisions of the previous Milestone 04 specification. All other mathematical, reconstruction, validation, and performance requirements remain applicable.
+
+## Primary design
+
+The package will primarily extract a ridge from a **user-specified frequency interval**.
+
+The frequency interval is mandatory for the main scientific workflow.
+
+The user supplies the frequency region where a physical oscillatory mode is expected. The algorithm determines the best continuous frequency trajectory within that region.
+
+There is no requirement to discover the number of modes in a waveform automatically.
+
+## API
+
+Implement:
+
+```
+ridge = extract_ridge(
+    result;
+    freqrange=(fmin, fmax),
+    method=:dp,
+    continuity=:physical,
+    max_rate=nothing,
+    ...
+)
+```
+
+For multiple modes:
+
+```
+ridges = extract_ridges(
+    result;
+    freqranges=[
+        (f1min, f1max),
+        (f2min, f2max),
+        (f3min, f3max),
+    ],
+    ...
+)
+```
+
+Each frequency range defines a separate tracking problem.
+
+Return ridges in the same order as the supplied ranges, rather than sorting by energy.
+
+The interface should also accept a time-dependent allowable frequency interval as an optional advanced feature.
+
+## Hard frequency constraints
+
+- Only frequency bins inside the interval are admissible.
+- The interval uses physical frequency coordinates in Hz.
+- Both endpoints are inclusive.
+- Validate that the interval is ordered and contains usable frequency bins.
+- Never silently expand the supplied interval.
+- If no feasible trajectory exists, report failure explicitly.
+- Work correctly on linear, logarithmic, and irregular frequency grids.
+
+## Ridge tracking
+
+Implement:
+
+1. Maximum-energy baseline restricted to the interval.
+2. Dense dynamic-programming reference.
+3. Efficient banded dynamic programming.
+4. Optional exact quadratic optimization, where mathematically valid.
+
+Use the previously specified energy objective, physical-frequency continuity penalties, hard jump-rate constraints, and deterministic tie-breaking.
+
+The algorithm must still distinguish an optimized path from a physically supported detection.
+
+A bounded range does not guarantee that a real mode exists at every time.
+
+## Multiple modes
+
+For disjoint user-specified ranges:
+
+- Track each mode independently.
+- Do not require sequential suppression.
+- Allow different tracking configurations for each range.
+- Preserve the user-specified mode ordering.
+
+For overlapping ranges:
+
+- Permit independent tracking.
+- Detect and report overlapping trajectories.
+- Do not assume that the tracks correspond to distinct physical components.
+- Provide optional suppression/exclusion mechanisms where useful.
+
+Sequential suppression is no longer the primary multi-ridge strategy. Keep it as an optional fallback for cases where multiple modes occupy the same interval.
+
+Do not introduce a joint multi-ridge optimizer in this milestone.
+
+## Component reconstruction
+
+For each extracted ridge, define its reconstruction band separately from the search interval.
+
+For example:
+
+```
+component = reconstruct_component(
+    result,
+    ridge;
+    bandwidth_hz=50.0,
+)
+```
+
+Here `bandwidth_hz` denotes the half-width around the ridge.
+
+The reconstruction band may be narrower than the search interval. Its purpose is to collect the SST coefficients belonging to the oscillatory component, not to constrain the DP search.
+
+Support fixed-Hz, fixed-bin, and custom reconstruction bands.
+
+If reconstruction bands overlap, use the ownership rules from the original milestone to avoid double counting.
+
+## Additional validation
+
+Perform controlled experiments with:
+
+1. A mode tracked inside a range containing no competing mode.
+2. A weak mode inside its range and a much stronger mode outside.
+3. A true mode approaching the frequency-range boundary.
+4. A true mode temporarily leaving the supplied range.
+5. Two modes with disjoint ranges.
+6. Two modes with overlapping ranges.
+7. An interval containing only noise.
+8. Frequency-grid refinement with the same physical range.
+9. A too-narrow interval that excludes part of the true trajectory.
+
+Report frequency RMSE, coverage, reconstruction accuracy, and boundary interactions.
+
+Do not silently clip a physical trajectory to the search boundary and interpret it as accurate tracking.
+
+## Acceptance criteria
+
+The milestone passes when:
+
+- User-specified frequency ranges are enforced exactly.
+- Ridge extraction is deterministic and globally optimal for its stated DP objective.
+- Physically meaningful tracking results remain stable under frequency-grid refinement.
+- Strong modes outside the search range do not attract the tracker.
+- Weak modes inside a known range can be recovered when distinguishable from the background.
+- Missing modes and range-boundary limitations are explicitly reported.
+- Individual-component reconstruction works with the standard WSST inverse.
+- Overlapping reconstruction regions do not double-count complex coefficients.
+
+## One important distinction
+
+We should keep three independent parameters:
+
+| Parameter      | Meaning                                                             | Example      |
+| -------------- | ------------------------------------------------------------------- | ------------ |
+| `freqrange`    | Where the tracker may search                                        | 1500–2500 Hz |
+| `max_rate`     | How quickly the frequency can evolve                                | 5000 Hz/s    |
+| `bandwidth_hz` | How far around the ridge to collect coefficients for reconstruction | ±50 Hz       |
+
+They solve different problems and should not be coupled internally.
+
+For your eventual BNS post-merger waveforms, this makes it possible to provide empirically motivated frequency intervals for the dominant and secondary modes, recover their evolving trajectories, and reconstruct each component separately.
+
+I would make constrained single-ridge DP the default and treat multiridge extraction as repeated calls with separate frequency ranges. This is simpler, more computationally efficient, and better aligned with the physical information we expect to have.

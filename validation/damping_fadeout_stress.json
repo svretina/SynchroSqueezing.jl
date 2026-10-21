@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "milestone": "04C fade-out stress test",
+  "signal": {
+    "sample_rate_hz": 512.0,
+    "samples": 2048,
+    "noise_standard_deviation": 0.012,
+    "true_damping_times_seconds": [0.32, 2.6],
+    "synthetic_detectability_floor": "five input-noise standard deviations",
+    "short_mode_last_detectable_time_seconds": 0.8984375
+  },
+  "short_lived_mode": {
+    "ridge_rmse_while_detectable_hz": 0.25837520122799285,
+    "thresholded_coverage_while_detectable": 0.9023861171366594,
+    "thresholded_activity_fraction_after_fade": 0.010712035286704474,
+    "reliability_aware_damping_time_seconds": 0.3187672206892039,
+    "reliability_aware_relative_error": 0.0038524353462379146,
+    "naive_full_window_damping_time_seconds": 0.63839916633704,
+    "naive_full_window_relative_error": 0.9949973948032498,
+    "reconstruction_relative_l2_error_while_detectable": 0.14281334058385559,
+    "reconstruction_similarity_while_detectable": 0.9906509288757444
+  },
+  "long_lived_mode": {
+    "ridge_rmse_hz": 1.0135808087000366,
+    "thresholded_coverage": 0.95068359375,
+    "reliability_aware_damping_time_seconds": 2.561851063862504,
+    "reliability_aware_relative_error": 0.014672667745190826,
+    "naive_full_window_relative_error": 0.015902018100662274,
+    "reconstruction_relative_l2_error": 0.06611222573371178,
+    "reconstruction_similarity": 0.9979807841069386
+  },
+  "interpretation": [
+    "A ridge optimizer returns a numerical path even after the physical mode has faded into noise.",
+    "The activity threshold was calibrated from the known synthetic five-sigma floor and is not a universal confidence threshold.",
+    "Extending the short-mode fit through the noise floor nearly doubles the estimated damping time.",
+    "Fit-window sensitivity is therefore a required diagnostic for fading modes."
+  ]
+}

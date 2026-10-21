@@ -1,9 +1,10 @@
 # API status
 
-Milestone 03A provides a periodic standard-compatible CWT adapter, exact
-spectral derivative, first-order WSST reference and fused kernels, scalar
-admissibility inversion, arbitrary masked component reconstruction, and a
-separate finite-bank frame inverse. Ridge extraction remains a later milestone.
+Milestone 04A adds frequency-constrained maximum-energy and globally optimal
+dynamic-programming ridge tracking, explicit activity diagnostics, ridge-band
+component reconstruction, and conservative ownership of overlapping bands.
+Milestone 04C adds analytic component features, exponential damping fits,
+local decay rates, and reconstruction/window sensitivity analysis.
 
 ```@docs
 SynchroSqueezing.package_version
@@ -16,6 +17,24 @@ SynchroSqueezing.log_frequency_grid
 SynchroSqueezing.wsst
 SynchroSqueezing.inverse_wsst
 SynchroSqueezing.reconstruct_region
+SynchroSqueezing.extract_ridge
+SynchroSqueezing.extract_ridges
+SynchroSqueezing.extract_predictive_ridge
+SynchroSqueezing.ridge_overlap
+SynchroSqueezing.ridge_mask
+SynchroSqueezing.reconstruct_component
+SynchroSqueezing.reconstruct_components
+SynchroSqueezing.ridge_metrics
+SynchroSqueezing.component_metrics
+SynchroSqueezing.analytic_signal
+SynchroSqueezing.component_features
+SynchroSqueezing.fit_exponential_damping
+SynchroSqueezing.local_damping_rate
+SynchroSqueezing.damping_sensitivity
+SynchroSqueezing.ridge_prominence
+SynchroSqueezing.mode_support
+SynchroSqueezing.supported_reconstruction
+SynchroSqueezing.mode_support_sensitivity
 SynchroSqueezing.admissibility_constant
 SynchroSqueezing.synchrosqueeze_reference!
 SynchroSqueezing.synchrosqueeze!
@@ -29,6 +48,21 @@ SynchroSqueezing.CWTMetadata
 SynchroSqueezing.CWTResult
 SynchroSqueezing.FrequencyEstimate
 SynchroSqueezing.RelativeThreshold
+SynchroSqueezing.RidgeConfig
+SynchroSqueezing.PredictiveRidgeConfig
+SynchroSqueezing.RidgeResult
+SynchroSqueezing.ComponentReconstruction
+SynchroSqueezing.ComponentSet
+SynchroSqueezing.ComponentFeatures
+SynchroSqueezing.DampingFit
+SynchroSqueezing.DampingSensitivityCase
+SynchroSqueezing.DampingSensitivity
+SynchroSqueezing.RidgeProminence
+SynchroSqueezing.ModeSupportConfig
+SynchroSqueezing.ModeSupportResult
+SynchroSqueezing.SupportedComponentReconstruction
+SynchroSqueezing.ModeSupportSensitivityCase
+SynchroSqueezing.ModeSupportSensitivity
 SynchroSqueezing.ReconstructionConvention
 SynchroSqueezing.WaveletValidation
 SynchroSqueezing.WSSTDiagnostics

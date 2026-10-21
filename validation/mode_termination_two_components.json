@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "milestone": "04C operational mode termination experiment",
+  "signal": {
+    "sample_rate_hz": 512.0,
+    "samples": 2048,
+    "true_damping_times_seconds": [0.32, 2.6],
+    "injected_white_background_standard_deviation": 0.012,
+    "note": "The activity algorithm does not use the injected-background level."
+  },
+  "activity_configuration": {
+    "relative_amplitude_threshold": 0.05,
+    "prominence_threshold": 100.0,
+    "prominence_ridge_half_width_hz": 1.0,
+    "prominence_background_band_hz": [2.5, 7.0],
+    "persistence_seconds": 0.08,
+    "recovery_factor": 1.25,
+    "boundary_reliable_interval_seconds": [0.1, 3.85]
+  },
+  "short_lived_mode": {
+    "component_reference_amplitude": 0.7235274157386647,
+    "amplitude_only_stop_seconds": {
+      "ten_percent": 0.83203125,
+      "five_percent": 1.056640625,
+      "two_percent": 1.349609375
+    },
+    "damping_time_seconds_by_amplitude_threshold": {
+      "ten_percent": 0.31886746818768136,
+      "five_percent": 0.32321026311925716,
+      "two_percent": 0.33155178003712216
+    },
+    "damping_time_spread_seconds": 0.0126843118494408,
+    "prominence_only_stop_seconds": {
+      "threshold_10": 1.990234375,
+      "threshold_100": 1.484375,
+      "threshold_1000": 1.20703125
+    },
+    "combined_stop_seconds": 1.017578125,
+    "combined_stop_reason": "insufficient_prominence",
+    "independent_five_sigma_evaluation_crossing_seconds": 0.9002914293632117,
+    "median_prominence_before_evaluation_crossing": 33250.57911199037,
+    "median_prominence_after_evaluation_crossing": 12.642585013227029,
+    "supported_damping_time_seconds": 0.32235053607887637,
+    "supported_damping_relative_error": 0.007345425246488624,
+    "naive_full_window_damping_time_seconds": 0.63839916633704,
+    "naive_full_window_damping_relative_error": 0.9949973948032498
+  },
+  "long_lived_mode": {
+    "component_reference_amplitude": 0.5386051034812255,
+    "combined_stop_seconds": 3.8515625,
+    "combined_stop_reason": "boundary",
+    "damping_time_spread_seconds_for_2_5_10_percent": 0.0,
+    "supported_damping_time_seconds": 2.5447543323210478,
+    "supported_damping_relative_error": 0.021248333722673984
+  },
+  "interpretation": [
+    "The increasing short-mode damping estimate at two percent reveals growing tail contamination.",
+    "The raw dynamic-programming trajectory continues after support terminates and is retained for diagnostics.",
+    "Prominence-only stopping changes materially across thresholds 10, 100, and 1000, so it is a safeguard rather than the primary definition of activity.",
+    "The combined operational mask prevents the severe damping bias produced by fitting the full noisy tail."
+  ]
+}

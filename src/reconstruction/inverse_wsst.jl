@@ -17,6 +17,25 @@ function _standard_synthesis(
     throw(ArgumentError("unsupported reconstruction signal kind $(convention.signal_kind)"))
 end
 
+"""Apply standard synthesis while retaining the positive-frequency analytic signal."""
+function _analytic_standard_synthesis(
+    integrated::AbstractVector{Complex{T}},
+    convention::ReconstructionConvention{T},
+) where {T<:AbstractFloat}
+    convention.method === :standard_analytic_l1 || throw(ArgumentError(
+        "standard inversion requires an L1-normalized analytic CWT result",
+    ))
+    isfinite(convention.admissibility) && !iszero(convention.admissibility) ||
+        throw(ArgumentError("standard inversion requires a finite nonzero admissibility constant"))
+    normalized = integrated ./ convention.admissibility
+    if convention.signal_kind === :real
+        return T(2) .* normalized
+    elseif convention.signal_kind === :analytic_complex
+        return normalized
+    end
+    throw(ArgumentError("unsupported reconstruction signal kind $(convention.signal_kind)"))
+end
+
 """Apply the retained backend-derived diagonal frame synthesis operator."""
 function _frame_synthesis(
     weighted::AbstractVector{Complex{T}},

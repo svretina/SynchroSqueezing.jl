@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "milestone": "04B",
+  "strategies": [
+    "first-order banded dynamic programming",
+    "exact pair-state second-order dynamic programming",
+    "fixed-Hz prediction-window-pruned second-order dynamic programming"
+  ],
+  "objective": {
+    "predictor": "constant physical frequency slope",
+    "nonuniform_time_support": true,
+    "curvature": "difference of consecutive physical frequency slopes",
+    "hard_frequency_range": true,
+    "optional_hard_rate_constraint_units": "Hz/s",
+    "optional_hard_chirp_rate_change_units": "Hz/s"
+  },
+  "verification": {
+    "random_exact_vs_exhaustive_cases": 12,
+    "exact_paths_and_costs_match_exhaustive": true,
+    "pruned_path_and_cost_match_exhaustive_pruned_problem": true,
+    "uniform_linear_chirp_zero_discrete_curvature": true,
+    "nonuniform_linear_chirp_zero_discrete_curvature": true,
+    "deterministic_tie_breaking": true,
+    "short_input_first_order_fallback": true,
+    "narrow_and_wide_prediction_windows_tested": true
+  },
+  "smooth_chirp_with_stronger_wandering_competitor": {
+    "frequency_bins": 161,
+    "time_samples": 160,
+    "freqrange_hz": [28.0, 78.0],
+    "max_rate_hz_per_second": 200.0,
+    "prediction_bandwidth_hz": 1.5,
+    "ridge_rmse_hz": {
+      "first_order_dp": 4.905581470507433,
+      "exact_second_order_dp": 0.2268466615110351,
+      "prediction_window_dp": 0.2268466615110351
+    },
+    "coverage": {
+      "first_order_dp": 1.0,
+      "exact_second_order_dp": 1.0,
+      "prediction_window_dp": 1.0
+    }
+  },
+  "notes": [
+    "Prediction-window tracking is heuristic relative to the unpruned objective.",
+    "The exact solver stores pair-state predecessors and has quadratic storage in constrained frequency-bin count.",
+    "Predictive smoothness is evaluated against known truth rather than visual appearance alone.",
+    "Abrupt-change tests demonstrate that narrow prediction windows can reject genuine dynamics."
+  ]
+}

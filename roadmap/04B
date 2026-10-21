@@ -1,0 +1,140 @@
+# Milestone 04 — Extension: Predictive Ridge Tracking
+
+Retain the previously defined frequency-constrained first-order DP as the reference implementation.
+
+Add predictive tracking as a second stage, after the first-order reference is validated.
+
+## Scientific motivation
+
+A physical oscillatory mode is expected to have a locally continuous instantaneous frequency and, in many cases, a locally continuous chirp rate.
+
+Use previous frequency estimates to predict future candidate positions rather than considering every frequency bin equally plausible.
+
+The supplied frequency interval remains a hard constraint.
+
+## 1. Predictor
+
+For uniform time steps:
+
+    f_pred[n+1] = f[n] + (f[n] - f[n-1])
+
+For nonuniform time steps:
+
+    slope = (f[n] - f[n-1]) / (t[n] - t[n-1])
+
+    f_pred[n+1] = f[n] + slope*(t[n+1]-t[n])
+
+Support constant-frequency prediction as the initial fallback before two ridge points are available.
+
+An optional acceleration predictor may use three or more observations, but do not introduce it before testing the constant-velocity predictor.
+
+## 2. Second-order cost
+
+Implement a trajectory objective consisting of:
+
+- Observation cost from WSST complex coefficient magnitude.
+- First-order frequency-change penalty.
+- Second-order prediction-error/curvature penalty.
+- User-specified frequency-range restrictions.
+- Optional maximum physical frequency-change rate.
+- Optional maximum physical chirp-rate-change constraint.
+
+For nonuniform time coordinates, define curvature using differences of physical frequency slopes rather than unscaled second differences.
+
+Use explicit reference scales so all penalties are dimensionless.
+
+## 3. Exact reference solver
+
+Implement second-order DP with state consisting of two consecutive frequency indices.
+
+For a candidate transition:
+
+    (i, k) -> (k, j)
+
+evaluate the exact accumulated objective.
+
+Support frequency-constrained and banded transitions.
+
+Backtrack to return the optimal complete trajectory.
+
+Test against exhaustive enumeration on small frequency-time matrices.
+
+Use deterministic tie-breaking.
+
+## 4. Predictive pruning and acceleration
+
+Optionally construct a local candidate window centered on:
+
+    f_pred = f[k] + slope(i,k)*Δt
+
+The window may be defined in Hz or in units of an explicitly modeled prediction uncertainty.
+
+Distinguish:
+
+- A hard physical constraint.
+- A heuristic candidate restriction.
+- A soft prediction-error penalty.
+
+Do not claim global optimality for a pruned solver relative to an unconstrained objective unless the pruning is proven exact.
+
+Consider beam search only if the exact banded second-order solver is computationally too expensive.
+
+## 5. Startup
+
+At the first sample, estimate the initial frequency within the supplied interval.
+
+At the second sample, use the ordinary first-order transition cost.
+
+From the third sample onward, apply the predictive second-order objective.
+
+Do not commit permanently to a single starting frequency when running exact offline DP: retain competing initial states.
+
+Allow optional initial frequency and initial slope priors.
+
+## 6. Prediction uncertainty
+
+Provide a configurable prediction bandwidth.
+
+A fixed-Hz search window is sufficient initially.
+
+Do not automatically shrink the prediction window merely because more samples have been processed.
+
+Increasing certainty requires an explicit model of observation errors and process variability.
+
+If a later Kalman-style estimator is introduced, distinguish its modeled covariance from empirical accuracy.
+
+## 7. Robustness
+
+Test:
+
+- Constant frequency.
+- Linear chirp.
+- Quadratic chirp.
+- Smooth nonlinear chirp.
+- Abrupt slope change.
+- Noisy frequency observations.
+- Short gaps.
+- Weak mode near a stronger mode.
+- Incorrect starting frequency.
+- Incorrect initial slope.
+- Crossing modes.
+- Nonuniform time steps.
+- Narrow and wide prediction windows.
+
+Compare first-order DP, second-order DP, and any approximate predictor on identical precomputed WSST matrices.
+
+Measure ridge RMSE, coverage, identity switching, total objective cost, runtime, and allocations.
+
+A predictive tracker must not be considered superior merely because its output looks smoother.
+
+## 8. Acceptance
+
+The extension passes when:
+
+1. Second-order DP agrees with exhaustive enumeration.
+2. A linear chirp incurs zero interior discrete curvature penalty on a uniform grid when represented exactly.
+3. Predictive tracking improves or preserves recovery in the targeted smooth-chirp cases.
+4. Rapid genuine changes are not silently smoothed away.
+5. Frequency ranges are always enforced.
+6. Computational cost and approximation behavior are documented.
+7. The production implementation falls back to first-order DP when insufficient information is available or when predictive constraints are inappropriate.

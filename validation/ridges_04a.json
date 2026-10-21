@@ -1,0 +1,47 @@
+{
+  "schema_version": 1,
+  "milestone": "04A",
+  "primary_workflow": "frequency-constrained independent ridge tracking",
+  "objective": {
+    "observation": "per-column normalized negative log squared magnitude",
+    "continuity": "quadratic physical- or log-frequency change",
+    "hard_search_interval": "inclusive freqrange in Hz",
+    "hard_rate_constraint_units": "Hz/s",
+    "tie_breaking": "lowest-frequency predecessor and endpoint"
+  },
+  "verification": {
+    "random_exhaustive_cases": 12,
+    "dense_matches_exhaustive": true,
+    "banded_matches_dense_for_equal_constraints": true,
+    "grid_sizes_tested": [160, 320, 640],
+    "float_precisions_tested": ["Float32", "Float64"],
+    "frequency_grids_tested": ["linear", "irregular", "log-coordinate penalty"]
+  },
+  "two_chirp_example": {
+    "samples": 1024,
+    "sample_rate_hz": 512.0,
+    "search_ranges_hz": [[30.0, 60.0], [90.0, 115.0]],
+    "reconstruction_half_width_hz": 8.0,
+    "ridge_coverage": [1.0, 1.0],
+    "ridge_rmse_hz": [0.6716805110037842, 0.42492589865545327],
+    "component_relative_l2_error": [0.03524667147761739, 0.020601987572437527],
+    "component_srer_db": [29.05763778744158, 33.72181758280864],
+    "summed_reconstruction": {
+      "full_record_relative_l2_error": 0.029109526722525435,
+      "full_record_normalized_similarity": 0.9995863423867836,
+      "full_record_srer_db": 30.719297109682394,
+      "interior_sample_range": [129, 896],
+      "interior_time_range_seconds": [0.25, 1.748046875],
+      "interior_relative_l2_error": 0.005371791093897626,
+      "interior_normalized_similarity": 0.9999910572223693,
+      "interior_srer_db": 45.39761770313284
+    },
+    "component_plus_sst_residual_relative_conservation_error": 1.4727055949848957e-16
+  },
+  "notes": [
+    "Ridge activity is reported separately from mathematical path validity.",
+    "Search range, jump rate, and reconstruction bandwidth are independent parameters.",
+    "Exclusive and fractional ownership prevent double counting of overlapping SST bins.",
+    "The reported waveform errors include periodic-boundary samples."
+  ]
+}

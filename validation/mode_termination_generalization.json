@@ -1,0 +1,37 @@
+{
+  "schema_version": 1,
+  "milestone": "04C mode-termination generalization",
+  "nonexponential_decay": {
+    "envelope": "exp(-t/0.70 - t^2/(2*0.90^2))",
+    "relative_amplitude_threshold": 0.05,
+    "analytical_crossing_seconds": 1.331243341780895,
+    "operational_stop_seconds": 1.3828125,
+    "stopping_time_error_seconds": 0.051569158219104905,
+    "stop_reason": "relative_amplitude",
+    "constant_damping_model_used_for_activity": false
+  },
+  "strong_neighbor_leakage": {
+    "short_mode_initial_amplitude": 0.35,
+    "long_mode_initial_amplitude": 1.2,
+    "amplitude_ratio": 3.4285714285714284,
+    "short_mode_damping_time_seconds": 0.4,
+    "expected_five_percent_crossing_seconds": 1.1982929094215964,
+    "frequency_separation_hz": [4.0, 6.0, 8.0, 12.0, 18.0],
+    "operational_stop_seconds": [0.33203125, 0.54296875, 0.6484375, 0.86328125, 0.99609375],
+    "signed_stopping_time_error_seconds": [
+      -0.8662616594215964,
+      -0.6553241594215964,
+      -0.5498554094215964,
+      -0.3350116594215964,
+      -0.2021991594215964
+    ],
+    "damping_relative_error": [null, 0.27489118347662234, 0.15110474439572075, 0.0853919655109594, 0.060220234205442424],
+    "stop_reason": ["relative_amplitude", "relative_amplitude", "relative_amplitude", "relative_amplitude", "relative_amplitude"]
+  },
+  "interpretation": [
+    "Nonexponential termination follows the observed envelope rather than an assumed exponential fit.",
+    "A stronger neighboring mode causes premature termination at every tested separation in this deliberately difficult configuration.",
+    "At four-hertz separation the supported interval does not yield a valid positive damping estimate.",
+    "Frequency separation and reconstruction bandwidth must be included in mode-support sensitivity studies."
+  ]
+}

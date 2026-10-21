@@ -28,5 +28,13 @@ components.
 Components whose instantaneous frequencies approach within a wavelet's
 resolution violate the separation assumptions. The validation suite keeps
 such a case as an explicit limitation: output remains finite, but component
-error is expected to become large. Crossing-aware ownership remains a later
-ridge-tracking problem.
+error is expected to become large. Milestone 04A adds deterministic ownership
+that prevents coefficient double counting, but it does not claim physically
+unique mode separation at crossings. See [Frequency-constrained ridge
+tracking](@ref).
+
+For envelope, phase, or damping analysis, pass `analytic=true` to
+`reconstruct_component` or `reconstruct_components`. This preserves the
+complex positive-frequency reconstruction for real inputs; its real part is
+the ordinary component reconstruction. See [Amplitude and damping
+estimation](@ref).
