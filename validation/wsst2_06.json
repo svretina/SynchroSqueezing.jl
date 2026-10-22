@@ -1,0 +1,213 @@
+{
+  "chirp_rate_regime": [
+    {
+      "chirp_rate_hz_per_s": 0.0,
+      "first_order": {
+        "boundary_frequency": {
+          "bias_hz": -0.09454949944382918,
+          "maximum_error_hz": 0.09454949944382918,
+          "rmse_hz": 0.09454949944382915
+        },
+        "full_reconstruction_relative_l2": 7.430902531476642e-16,
+        "interior_frequency": {
+          "bias_hz": -0.09454949944382918,
+          "maximum_error_hz": 0.09454949944382918,
+          "rmse_hz": 0.09454949944382915
+        },
+        "median_frequency_width_hz": 0.09454949944382918
+      },
+      "second_order": {
+        "boundary_frequency": {
+          "bias_hz": -0.09454949944382918,
+          "maximum_error_hz": 0.09454949944382918,
+          "rmse_hz": 0.09454949944382915
+        },
+        "chirp_rate_absolute_error_hz_per_s": 2.791338802512321e-13,
+        "excluded_fraction": 0.0,
+        "fallback_fraction": 0.0,
+        "full_reconstruction_relative_l2": 7.430902531476642e-16,
+        "interior_frequency": {
+          "bias_hz": -0.09454949944382918,
+          "maximum_error_hz": 0.09454949944382918,
+          "rmse_hz": 0.09454949944382915
+        },
+        "median_chirp_rate_hz_per_s": -2.791338802512321e-13,
+        "median_frequency_width_hz": 0.09454949944382918,
+        "second_order_valid_fraction": 1.0
+      }
+    },
+    {
+      "chirp_rate_hz_per_s": 20.0,
+      "first_order": {
+        "boundary_frequency": {
+          "bias_hz": 0.2392197928253611,
+          "maximum_error_hz": 34.61067853170189,
+          "rmse_hz": 2.308233768244496
+        },
+        "full_reconstruction_relative_l2": 5.076301440236109e-16,
+        "interior_frequency": {
+          "bias_hz": 0.004873760196514559,
+          "maximum_error_hz": 0.12044632925472598,
+          "rmse_hz": 0.06449165673635751
+        },
+        "median_frequency_width_hz": 0.057777566011430914
+      },
+      "second_order": {
+        "boundary_frequency": {
+          "bias_hz": 0.11060466490545026,
+          "maximum_error_hz": 20.150166852057843,
+          "rmse_hz": 3.2248602250409646
+        },
+        "chirp_rate_absolute_error_hz_per_s": 1.1368683772161603e-13,
+        "excluded_fraction": 0.0,
+        "fallback_fraction": 0.17741003179159068,
+        "full_reconstruction_relative_l2": 5.155868811575228e-16,
+        "interior_frequency": {
+          "bias_hz": -5.0692899518080724e-5,
+          "maximum_error_hz": 0.11110435205784341,
+          "rmse_hz": 0.06422058590019733
+        },
+        "median_chirp_rate_hz_per_s": 19.999999999999886,
+        "median_frequency_width_hz": 0.05564202298631391,
+        "second_order_valid_fraction": 0.8225899682084094
+      }
+    },
+    {
+      "chirp_rate_hz_per_s": 80.0,
+      "first_order": {
+        "boundary_frequency": {
+          "bias_hz": 0.8633724972191325,
+          "maximum_error_hz": 149.18242491657398,
+          "rmse_hz": 9.389562685451336
+        },
+        "full_reconstruction_relative_l2": 4.6467490449036925e-16,
+        "interior_frequency": {
+          "bias_hz": 0.02766383945124205,
+          "maximum_error_hz": 0.2826056729699644,
+          "rmse_hz": 0.08296395685913552
+        },
+        "median_frequency_width_hz": 0.07802757714639236
+      },
+      "second_order": {
+        "boundary_frequency": {
+          "bias_hz": 0.3132821190211344,
+          "maximum_error_hz": 81.7741935483871,
+          "rmse_hz": 5.3087285706443526
+        },
+        "chirp_rate_absolute_error_hz_per_s": 5.542233338928781e-13,
+        "excluded_fraction": 0.0,
+        "fallback_fraction": 0.1807242261293376,
+        "full_reconstruction_relative_l2": 4.959371172401696e-16,
+        "interior_frequency": {
+          "bias_hz": -0.00014483685576575459,
+          "maximum_error_hz": 0.11123470522802847,
+          "rmse_hz": 0.06419194284131183
+        },
+        "median_chirp_rate_hz_per_s": 80.00000000000055,
+        "median_frequency_width_hz": 0.0555552879178568,
+        "second_order_valid_fraction": 0.8192757738706624
+      }
+    }
+  ],
+  "configuration": {
+    "boundary": "periodic",
+    "boundary_samples_per_side": 128,
+    "frequency_bins": 900,
+    "frequency_range_hz": [
+      20.0,
+      220.0
+    ],
+    "interior_samples": [
+      129,
+      896
+    ],
+    "sample_rate_hz": 512.0,
+    "samples": 1024,
+    "threshold_relative": 1.0e-5,
+    "voices_per_octave": 32
+  },
+  "environment": {
+    "fftw_threads": 1,
+    "julia_threads": 1,
+    "julia_version": "1.13.0-rc1",
+    "package_versions": {
+      "BenchmarkTools": "1.8.0",
+      "ContinuousWavelets": "1.2.2",
+      "FFTW": "1.10.0",
+      "JSON": "1.11.0"
+    },
+    "process_maxrss_bytes": 1362862080
+  },
+  "generated_at_utc": "2026-10-22T10:27:14.098",
+  "milestone": "06",
+  "notes": [
+    "Both orders use the same plan, wavelet bank, threshold, output grid, and deposition rule.",
+    "WSST2 currently has a scalar reference implementation and no package-level threaded kernel.",
+    "Peak RSS is process-wide; allocated bytes are per warmed BenchmarkTools evaluation.",
+    "Raw MATLAB matrices are not compared because normalization, scale order, units, and boundaries differ; the independently published equations and linear-chirp invariant are used instead."
+  ],
+  "performance": {
+    "additional_second_order_operators_end_to_end": {
+      "allocated_bytes": 73326808,
+      "allocations": 243,
+      "maximum_ms": 311.07707,
+      "median_ms": 20.967054,
+      "minimum_ms": 17.897488,
+      "samples": 10
+    },
+    "cwt_and_first_derivative": {
+      "allocated_bytes": 33152912,
+      "allocations": 150,
+      "maximum_ms": 9.912694,
+      "median_ms": 4.8187940000000005,
+      "minimum_ms": 4.352456,
+      "samples": 10
+    },
+    "second_order_frequency_from_operators": {
+      "allocated_bytes": 16626464,
+      "allocations": 27,
+      "maximum_ms": 32.564995,
+      "median_ms": 29.769513500000002,
+      "minimum_ms": 28.598216,
+      "samples": 10
+    },
+    "wsst1_end_to_end": {
+      "allocated_bytes": 48053448,
+      "allocations": 230,
+      "maximum_ms": 42.628448,
+      "median_ms": 29.8219905,
+      "minimum_ms": 23.199934,
+      "samples": 6
+    },
+    "wsst1_reassignment_after_cwt": {
+      "allocated_bytes": 14900536,
+      "allocations": 80,
+      "maximum_ms": 25.634562,
+      "median_ms": 22.5378115,
+      "minimum_ms": 20.792688,
+      "samples": 10
+    },
+    "wsst2_end_to_end": {
+      "allocated_bytes": 104853840,
+      "allocations": 351,
+      "maximum_ms": 100.446522,
+      "median_ms": 83.83604299999999,
+      "minimum_ms": 59.97738,
+      "samples": 6
+    },
+    "wsst2_reassignment_after_operators": {
+      "allocated_bytes": 31527032,
+      "allocations": 108,
+      "maximum_ms": 58.906863,
+      "median_ms": 50.7906655,
+      "minimum_ms": 48.524974,
+      "samples": 10
+    }
+  },
+  "reference": {
+    "commit": "2721d07e943abcc6faf7bfcaf974b5dfad597882",
+    "implementation": "Pham-Meignen WSST2",
+    "repository": "https://github.com/phamduonghung/WSST2"
+  },
+  "schema_version": 1
+}

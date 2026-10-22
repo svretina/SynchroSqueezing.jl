@@ -112,6 +112,47 @@ struct FrequencyEstimate{T<:AbstractFloat}
     valid::BitMatrix
 end
 
+"""
+    SecondOrderOperators
+
+Transforms required by the time-derivative formulation of second-order WSST.
+`cwt` contains ``W`` and ``∂ₜW``; the remaining arrays contain ``∂ₜ²W``, the
+time-moment numerator, and its time derivative. All arrays use scale × time
+layout and physical seconds.
+"""
+struct SecondOrderOperators{R,A<:AbstractMatrix,B<:AbstractMatrix,C<:AbstractMatrix}
+    cwt::R
+    second_derivative::A
+    time_moment::B
+    time_moment_derivative::C
+end
+
+"""Second-order frequency, chirp-rate, and validity diagnostics."""
+struct SecondOrderEstimate{T<:AbstractFloat,C<:Complex{T}}
+    values::Matrix{T}
+    valid::BitMatrix
+    second_order_valid::BitMatrix
+    used_fallback::BitMatrix
+    first_order::Matrix{T}
+    chirp_rate::Matrix{T}
+    time_reassignment::Matrix{C}
+    time_derivative::Matrix{C}
+end
+
+"""Configuration and observed validity rates of a WSST reassignment estimator."""
+struct ReassignmentMetadata{T<:AbstractFloat,C}
+    order::Int
+    estimator::Symbol
+    implementation::Symbol
+    denominator_threshold::T
+    fallback::Symbol
+    max_abs_chirp_rate::T
+    second_order_valid_fraction::T
+    fallback_fraction::T
+    excluded_fraction::T
+    wavelet_configuration::C
+end
+
 """Backend-derived weights and synthesis rule used by inverse WSST."""
 struct ReconstructionConvention{T<:AbstractFloat}
     scale_weights::Vector{T}
@@ -144,7 +185,7 @@ Bin-integrated complex synchrosqueezed coefficients with frequency on the
 first axis and time on the second. CWT, derivative, and phase arrays are
 retained only when requested.
 """
-struct WSSTResult{T<:AbstractFloat,C<:Complex{T},M,P,R,DC,W,D,PH,PV}
+struct WSSTResult{T<:AbstractFloat,C<:Complex{T},M,P,R,DC,W,D,PH,PV,RM}
     coefficients::Matrix{C}
     frequencies::Vector{T}
     frequency_edges::Vector{T}
@@ -152,6 +193,7 @@ struct WSSTResult{T<:AbstractFloat,C<:Complex{T},M,P,R,DC,W,D,PH,PV}
     scales::Vector{T}
     reassignment::Symbol
     threshold::P
+    reassignment_metadata::RM
     diagnostics::WSSTDiagnostics{T,C}
     reconstruction::ReconstructionConvention{T}
     residual::R

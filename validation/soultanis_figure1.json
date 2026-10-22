@@ -1,0 +1,111 @@
+{
+  "implementation": {
+    "backend": "ContinuousWavelets.jl",
+    "input_sampling": "native file cadence",
+    "ridge_search": "maximum coefficient within +/-450 Hz of the paper Eq. (10)-(12) drift",
+    "voices_per_octave": 64,
+    "wavelet": "analytic Morse(gamma=3, beta=20, center_frequency=1)",
+    "window": "none (the paper does not report one for Figure 1)",
+    "wsst_frequency_bins": 555,
+    "zero_padding": false
+  },
+  "paper": {
+    "arxiv": "2111.08353v2",
+    "figure": 1,
+    "not_reported": [
+      "wavelet family and parameters",
+      "scale grid",
+      "boundary handling",
+      "coefficient normalization"
+    ],
+    "read_from_figure": {
+      "coefficient_scale": "linear, normalized per panel to [0, 1]",
+      "colormap": "Matplotlib turbo",
+      "frequency_limits_hz": [
+        1350.0,
+        4120.0
+      ],
+      "reference_frequencies_hz": {
+        "fminus": 1460.0,
+        "fpeak": 2530.0,
+        "fplus": 3880.0,
+        "fspiral": 2000.0
+      }
+    },
+    "stated": {
+      "component_mass_solar": 1.25,
+      "merger_alignment": "maximum hypot(h_plus, h_cross)",
+      "ridge": "maximum wavelet coefficient at each time",
+      "strain_component": "h_plus",
+      "time_limits_ms": [
+        0.0,
+        15.0
+      ]
+    }
+  },
+  "reference_fit": {
+    "breakpoint_ms": 6.437750000000008,
+    "intercept_hz": 2797.999999999999,
+    "slope_hz_per_ms": -48.249999999992355,
+    "source": "paper Eqs. (10)-(12), evaluated at Mtot=2.50 solar masses"
+  },
+  "schema_version": 1,
+  "waveforms": [
+    {
+      "component_mass_solar": 1.2,
+      "file": "Z4c-mpa1-m1.20_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "wsst2_fallback_fraction": 0.023563870491067895,
+      "wsst2_valid_fraction": 0.9764361295089321
+    },
+    {
+      "component_mass_solar": 1.25,
+      "file": "Z4c-mpa1-m1.25_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "wsst2_fallback_fraction": 0.01903320109338972,
+      "wsst2_valid_fraction": 0.9809667989066103
+    },
+    {
+      "component_mass_solar": 1.3,
+      "file": "Z4c-mpa1-m1.30_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "wsst2_fallback_fraction": 0.028721678780656814,
+      "wsst2_valid_fraction": 0.9712783212193432
+    },
+    {
+      "component_mass_solar": 1.35,
+      "file": "Z4c-mpa1-m1.35_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305928,
+      "wsst2_fallback_fraction": 0.028573848130228872,
+      "wsst2_valid_fraction": 0.9714261518697711
+    },
+    {
+      "component_mass_solar": 1.4,
+      "file": "Z4c-mpa1-m1.40_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305928,
+      "wsst2_fallback_fraction": 0.021770874342364268,
+      "wsst2_valid_fraction": 0.9782291256576358
+    },
+    {
+      "component_mass_solar": 1.45,
+      "file": "Z4c-mpa1-m1.45_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509306276,
+      "wsst2_fallback_fraction": 0.034821399824708894,
+      "wsst2_valid_fraction": 0.9651786001752911
+    },
+    {
+      "component_mass_solar": 1.5,
+      "file": "Z4c-mpa1-m1.50_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "wsst2_fallback_fraction": 0.02697243177086228,
+      "wsst2_valid_fraction": 0.9730275682291377
+    },
+    {
+      "component_mass_solar": 1.55,
+      "file": "Z4c-mpa1-m1.55_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 135363.7901861265,
+      "wsst2_fallback_fraction": 0.02351184269240409,
+      "wsst2_valid_fraction": 0.9764881573075959
+    }
+  ]
+}

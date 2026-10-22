@@ -9,6 +9,7 @@ include("backends/interface.jl")
 include("backends/continuous_wavelets.jl")
 include("squeezing/grids.jl")
 include("squeezing/phase.jl")
+include("squeezing/second_order.jl")
 include("squeezing/reassignment.jl")
 include("squeezing/wsst.jl")
 include("ridges/types.jl")
@@ -40,6 +41,9 @@ export AbstractCWTBackend,
        CWTMetadata,
        CWTResult,
        FrequencyEstimate,
+       SecondOrderOperators,
+       SecondOrderEstimate,
+       ReassignmentMetadata,
        NoThreshold,
        ReconstructionConvention,
        RelativeThreshold,
@@ -77,6 +81,8 @@ export AbstractCWTBackend,
        extract_ridges,
        extract_predictive_ridge,
        instantaneous_frequency,
+       second_order_operators,
+       second_order_frequency,
        inverse_cwt,
        inverse_wsst,
        linear_frequency_grid,

@@ -9,8 +9,9 @@ suitable, while keeping synchrosqueezing, ridge tracking, and reconstruction
 as explicit package layers.
 
 `ContinuousWavelets.jl` is the selected CWT backend. The package includes a
-periodic adapter with derivative support, metadata validation, first-order
-wavelet synchrosqueezing, residual accounting, and direct WSST inversion.
+periodic adapter with derivative support, metadata validation, first- and
+second-order wavelet synchrosqueezing, residual accounting, and direct WSST
+inversion.
 
 ## Status
 
@@ -31,6 +32,13 @@ full-pipeline scientific regression, reproducible stage-by-stage profiling,
 and a memory-bounded ridge-DP optimization. On the recorded 1024-sample
 workload, the first optimized ridge kernel was about 26.6 times faster while
 preserving the dense reference path exactly.
+Milestone 06 adds a physical-unit, time-derivative WSST2 reference
+implementation with explicit chirp-rate, conditioning, and fallback
+diagnostics. The original complex coefficients and all existing inverse,
+ridge, component, damping, and activity APIs are reused unchanged.
+
+STFT-based FSST remains a planned backend and is not implemented in the
+current package.
 
 See the [roadmap](roadmap/README.md), [numerical conventions](docs/src/conventions.md),
 [dependency audit](docs/src/dependency_audit.md), and [provisional backend

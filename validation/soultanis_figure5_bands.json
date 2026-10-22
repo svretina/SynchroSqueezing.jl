@@ -1,0 +1,800 @@
+{
+  "experiment": "independent WSST1 and WSST2 reassignment for each Figure 5 secondary-frequency prior",
+  "limitations": [
+    "Figure-read priors are approximate and are not tabulated values from the authors.",
+    "The paper does not state the GW-spectrum taper. A one-sided end taper is used to avoid suppressing the physical merger onset while conditioning the finite record.",
+    "Figure 2 labels the plotted spectrum as post-merger, although the text states that peak extraction uses the full signal including inspiral; secondary dashed lines are therefore taken from Figure 5 rather than redefined from the plotted curve.",
+    "Advanced LIGO and Einstein Telescope sensitivity curves from Figure 5 are not overplotted.",
+    "Each colored mode is normalized independently, so color intensity cannot compare amplitudes between modes.",
+    "Overlapping high-mass priors are deliberately analyzed independently; their ridges are not proof of identifiable physical components.",
+    "The composite visualizes separate reassignment results and is not a linear time-domain signal reconstruction."
+  ],
+  "paper": "Soultanis et al., arXiv:2111.08353v2",
+  "prior_provenance": {
+    "colors": "Figure 2 convention; purple for the Figure 5 f_spiral-0 addition",
+    "dominant_line": "maximum of the full-waveform effective spectrum inside the analytic fpeak drift range",
+    "f_2_plus_or_minus_0_and_f_spiral_minus_0_bounds": "approximately digitized from Figure 5 shaded areas",
+    "f_spiral_bounds": "chosen ±120 Hz around the Figure 5 dashed center; no shaded range is reported",
+    "secondary_lines": "approximately digitized from Figure 5 dashed lines"
+  },
+  "schema_version": 1,
+  "settings": {
+    "display_db": [
+      -42.0,
+      0.0
+    ],
+    "fft_minimum_padded_length": 16384,
+    "fourier_definition": "h_eff,+ = f * abs(FFT(h_plus)) * dt, with strain scaled to 40 Mpc",
+    "fourier_input": "post-merger h_plus beginning at maximum strain, matching the Figure 2 caption",
+    "fourier_range_hz": [
+      0.0,
+      5000.0
+    ],
+    "fourier_window": "right-hand cosine/Tukey taper over the final 10.0% of the finite record; the merger onset is not tapered",
+    "normalization": "each mode and WSST order independently normalized before transparent-color composition",
+    "threshold": "RelativeThreshold(1e-6)",
+    "time_range_ms": [
+      0.0,
+      15.0
+    ],
+    "voices_per_octave": 64
+  },
+  "waveforms": [
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1220.0,
+            1600.0
+          ],
+          "figure5_line_hz": 1400.0,
+          "local_fourier_maximum_in_bounds_hz": 1598.687341370386,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1312.0,
+            "frequency_90th_percentile_hz": 1444.0,
+            "median_frequency_hz": 1388.0,
+            "supported_duration_ms": 5.17124999999995
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1280.0,
+            "frequency_90th_percentile_hz": 1388.8,
+            "median_frequency_hz": 1340.0,
+            "supported_duration_ms": 4.417724999999957
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            1860.0,
+            2100.0
+          ],
+          "figure5_line_hz": 1980.0,
+          "local_fourier_maximum_in_bounds_hz": 1900.24851945834,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.03214285714285714,
+            "frequency_10th_percentile_hz": 1869.113924050633,
+            "frequency_90th_percentile_hz": 2072.6582278481014,
+            "median_frequency_hz": 1929.873417721519,
+            "supported_duration_ms": 4.1369999999999605
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.012987012987012988,
+            "frequency_10th_percentile_hz": 1875.1898734177216,
+            "frequency_90th_percentile_hz": 2008.860759493671,
+            "median_frequency_hz": 1920.759493670886,
+            "supported_duration_ms": 3.4130249999999673
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            3750.0,
+            4050.0
+          ],
+          "figure5_line_hz": 3880.0,
+          "local_fourier_maximum_in_bounds_hz": 3796.3660638743795,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3791.012658227848,
+            "frequency_90th_percentile_hz": 3898.1012658227846,
+            "median_frequency_hz": 3818.3544303797466,
+            "supported_duration_ms": 3.0879749999999704
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3860.1265822784812,
+            "frequency_90th_percentile_hz": 4031.012658227848,
+            "median_frequency_hz": 3955.0632911392404,
+            "supported_duration_ms": 1.8025499999999826
+          }
+        }
+      ],
+      "component_mass_solar": 1.2,
+      "dominant_fourier_peak_hz": 2557.0735511841576,
+      "dominant_frequency_range_hz": [
+        2492.7036304000335,
+        2750.4800000000005
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.20_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "total_mass_solar": 2.4
+    },
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1270.0,
+            1700.0
+          ],
+          "figure5_line_hz": 1500.0,
+          "local_fourier_maximum_in_bounds_hz": 1590.4253912857846,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1305.8333333333333,
+            "frequency_90th_percentile_hz": 1528.7962962962963,
+            "median_frequency_hz": 1475.0462962962963,
+            "supported_duration_ms": 5.14169999999995
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1345.648148148148,
+            "frequency_90th_percentile_hz": 1506.8981481481483,
+            "median_frequency_hz": 1409.351851851852,
+            "supported_duration_ms": 2.6003999999999747
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            1900.0,
+            2140.0
+          ],
+          "figure5_line_hz": 2020.0,
+          "local_fourier_maximum_in_bounds_hz": 2119.190196700279,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.022727272727272728,
+            "frequency_10th_percentile_hz": 1918.2278481012659,
+            "frequency_90th_percentile_hz": 2128.151898734177,
+            "median_frequency_hz": 1994.1772151898733,
+            "supported_duration_ms": 3.2504999999999686
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.002770083102493075,
+            "frequency_10th_percentile_hz": 1939.493670886076,
+            "frequency_90th_percentile_hz": 2091.3924050632913,
+            "median_frequency_hz": 1985.0632911392406,
+            "supported_duration_ms": 5.333774999999949
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            3820.0,
+            4100.0
+          ],
+          "figure5_line_hz": 3970.0,
+          "local_fourier_maximum_in_bounds_hz": 3829.413864212785,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3954.6835443037976,
+            "frequency_90th_percentile_hz": 4025.5696202531644,
+            "median_frequency_hz": 3990.1265822784812,
+            "supported_duration_ms": 2.5265249999999755
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3890.8860759493673,
+            "frequency_90th_percentile_hz": 4082.6329113924053,
+            "median_frequency_hz": 4057.46835443038,
+            "supported_duration_ms": 2.0684999999999802
+          }
+        }
+      ],
+      "component_mass_solar": 1.25,
+      "dominant_fourier_peak_hz": 2519.894775803451,
+      "dominant_frequency_range_hz": [
+        2487.378562500048,
+        2797.999999999999
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.25_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "total_mass_solar": 2.5
+    },
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1330.0,
+            1690.0
+          ],
+          "figure5_line_hz": 1510.0,
+          "local_fourier_maximum_in_bounds_hz": 1689.5687923010023,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1390.0,
+            "frequency_90th_percentile_hz": 1578.0,
+            "median_frequency_hz": 1514.0,
+            "supported_duration_ms": 4.875749999999953
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.003115264797507788,
+            "frequency_10th_percentile_hz": 1358.0,
+            "frequency_90th_percentile_hz": 1502.0,
+            "median_frequency_hz": 1410.0,
+            "supported_duration_ms": 4.742774999999955
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            2020.0,
+            2260.0
+          ],
+          "figure5_line_hz": 2140.0,
+          "local_fourier_maximum_in_bounds_hz": 2243.1194479693013,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.025252525252525252,
+            "frequency_10th_percentile_hz": 2050.3797468354433,
+            "frequency_90th_percentile_hz": 2245.7215189873414,
+            "median_frequency_hz": 2138.481012658228,
+            "supported_duration_ms": 2.9254499999999717
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.02304147465437788,
+            "frequency_10th_percentile_hz": 2029.113924050633,
+            "frequency_90th_percentile_hz": 2177.974683544304,
+            "median_frequency_hz": 2117.215189873418,
+            "supported_duration_ms": 3.206174999999969
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            3850.0,
+            4130.0
+          ],
+          "figure5_line_hz": 4000.0,
+          "local_fourier_maximum_in_bounds_hz": 3870.7236146357927,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.024539877300613498,
+            "frequency_10th_percentile_hz": 4031.46835443038,
+            "frequency_90th_percentile_hz": 4122.20253164557,
+            "median_frequency_hz": 4094.5569620253164,
+            "supported_duration_ms": 2.408324999999977
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3907.7721518987346,
+            "frequency_90th_percentile_hz": 4101.645569620253,
+            "median_frequency_hz": 4066.2025316455697,
+            "supported_duration_ms": 2.2753499999999782
+          }
+        }
+      ],
+      "component_mass_solar": 1.3,
+      "dominant_fourier_peak_hz": 2590.1213515225636,
+      "dominant_frequency_range_hz": [
+        2566.053417600089,
+        2863.6799999999985
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.30_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "total_mass_solar": 2.6
+    },
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1650.0,
+            2020.0
+          ],
+          "figure5_line_hz": 1820.0,
+          "local_fourier_maximum_in_bounds_hz": 2015.915820642879,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1693.763440860215,
+            "frequency_90th_percentile_hz": 1856.8817204301076,
+            "median_frequency_hz": 1789.247311827957,
+            "supported_duration_ms": 2.08327499999998
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.03773584905660377,
+            "frequency_10th_percentile_hz": 1658.752688172043,
+            "frequency_90th_percentile_hz": 1721.6129032258063,
+            "median_frequency_hz": 1677.8494623655913,
+            "supported_duration_ms": 0.7830749999999924
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            2110.0,
+            2350.0
+          ],
+          "figure5_line_hz": 2230.0,
+          "local_fourier_maximum_in_bounds_hz": 2259.643348138637,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.014184397163120567,
+            "frequency_10th_percentile_hz": 2125.1898734177216,
+            "frequency_90th_percentile_hz": 2325.6962025316457,
+            "median_frequency_hz": 2223.9240506329115,
+            "supported_duration_ms": 4.16654999999996
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 2167.721518987342,
+            "frequency_90th_percentile_hz": 2273.746835443038,
+            "median_frequency_hz": 2216.3291139240505,
+            "supported_duration_ms": 2.8367999999999727
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            3930.0,
+            4220.0
+          ],
+          "figure5_line_hz": 4080.0,
+          "local_fourier_maximum_in_bounds_hz": 3961.6050655666413,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 4062.1518987341774,
+            "frequency_90th_percentile_hz": 4138.506329113924,
+            "median_frequency_hz": 4106.202531645569,
+            "supported_duration_ms": 1.5218249999999853
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3952.025316455696,
+            "frequency_90th_percentile_hz": 4157.594936708861,
+            "median_frequency_hz": 4019.9367088607596,
+            "supported_duration_ms": 1.6252499999999843
+          }
+        }
+      ],
+      "component_mass_solar": 1.35,
+      "dominant_fourier_peak_hz": 2693.39572758024,
+      "dominant_frequency_range_hz": [
+        2672.592033700124,
+        2947.52
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.35_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305928,
+      "total_mass_solar": 2.7
+    },
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1040.0,
+            1330.0
+          ],
+          "figure5_line_hz": 1190.0,
+          "local_fourier_maximum_in_bounds_hz": 1297.1261632825083,
+          "mode": "f_spiral_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.050387596899224806,
+            "frequency_10th_percentile_hz": 1259.1518987341772,
+            "frequency_90th_percentile_hz": 1326.3291139240507,
+            "median_frequency_hz": 1311.6455696202531,
+            "supported_duration_ms": 3.811949999999963
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1164.8101265822784,
+            "frequency_90th_percentile_hz": 1285.9493670886077,
+            "median_frequency_hz": 1212.5316455696202,
+            "supported_duration_ms": 5.038274999999952
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            1560.0,
+            2180.0
+          ],
+          "figure5_line_hz": 2010.0,
+          "local_fourier_maximum_in_bounds_hz": 2110.9282466158015,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1700.0,
+            "frequency_90th_percentile_hz": 2000.0,
+            "median_frequency_hz": 1900.0,
+            "supported_duration_ms": 3.6198749999999653
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1600.0,
+            "frequency_90th_percentile_hz": 1760.0,
+            "median_frequency_hz": 1692.0,
+            "supported_duration_ms": 2.6003999999999747
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            2200.0,
+            2440.0
+          ],
+          "figure5_line_hz": 2320.0,
+          "local_fourier_maximum_in_bounds_hz": 2387.7035744499676,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0029585798816568047,
+            "frequency_10th_percentile_hz": 2269.8734177215188,
+            "frequency_90th_percentile_hz": 2424.8101265822784,
+            "median_frequency_hz": 2336.7088607594937,
+            "supported_duration_ms": 4.993949999999952
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 2274.1265822784812,
+            "frequency_90th_percentile_hz": 2403.5443037974683,
+            "median_frequency_hz": 2345.8227848101264,
+            "supported_duration_ms": 2.8811249999999724
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            3860.0,
+            4300.0
+          ],
+          "figure5_line_hz": 4070.0,
+          "local_fourier_maximum_in_bounds_hz": 3978.128965735845,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3908.0,
+            "frequency_90th_percentile_hz": 4028.8,
+            "median_frequency_hz": 3988.0,
+            "supported_duration_ms": 2.05372499999998
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3928.0,
+            "frequency_90th_percentile_hz": 4092.0,
+            "median_frequency_hz": 4004.0,
+            "supported_duration_ms": 1.758224999999983
+          }
+        }
+      ],
+      "component_mass_solar": 1.4,
+      "dominant_fourier_peak_hz": 2767.7532783416577,
+      "dominant_frequency_range_hz": [
+        2764.7853168000556,
+        3049.5199999999995
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.40_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305928,
+      "total_mass_solar": 2.8
+    },
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1210.0,
+            1510.0
+          ],
+          "figure5_line_hz": 1360.0,
+          "local_fourier_maximum_in_bounds_hz": 1507.8058904399359,
+          "mode": "f_spiral_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1346.7088607594937,
+            "frequency_90th_percentile_hz": 1445.4430379746836,
+            "median_frequency_hz": 1388.4810126582279,
+            "supported_duration_ms": 3.7085249999999643
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0038022813688212928,
+            "frequency_10th_percentile_hz": 1323.9240506329113,
+            "frequency_90th_percentile_hz": 1464.4303797468353,
+            "median_frequency_hz": 1399.873417721519,
+            "supported_duration_ms": 3.885824999999963
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            1820.0,
+            2310.0
+          ],
+          "figure5_line_hz": 2090.0,
+          "local_fourier_maximum_in_bounds_hz": 2214.20262267344,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1895.6910569105692,
+            "frequency_90th_percentile_hz": 2110.8130081300815,
+            "median_frequency_hz": 2082.9268292682927,
+            "supported_duration_ms": 2.940224999999972
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1943.4959349593496,
+            "frequency_90th_percentile_hz": 2102.048780487805,
+            "median_frequency_hz": 2035.121951219512,
+            "supported_duration_ms": 1.8173249999999825
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            2330.0,
+            2570.0
+          ],
+          "figure5_line_hz": 2450.0,
+          "local_fourier_maximum_in_bounds_hz": 2395.9655245346926,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.002232142857142857,
+            "frequency_10th_percentile_hz": 2472.784810126582,
+            "frequency_90th_percentile_hz": 2554.8101265822784,
+            "median_frequency_hz": 2530.506329113924,
+            "supported_duration_ms": 6.619199999999936
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 2427.215189873418,
+            "frequency_90th_percentile_hz": 2548.73417721519,
+            "median_frequency_hz": 2509.240506329114,
+            "supported_duration_ms": 2.940224999999972
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            3900.0,
+            4310.0
+          ],
+          "figure5_line_hz": 4100.0,
+          "local_fourier_maximum_in_bounds_hz": 4027.7006662436643,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3927.864077669903,
+            "frequency_90th_percentile_hz": 4007.4757281553398,
+            "median_frequency_hz": 3959.7087378640776,
+            "supported_duration_ms": 1.6104749999999846
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3999.5145631067962,
+            "frequency_90th_percentile_hz": 4179.834951456311,
+            "median_frequency_hz": 4077.135922330097,
+            "supported_duration_ms": 1.5956999999999846
+          }
+        }
+      ],
+      "component_mass_solar": 1.45,
+      "dominant_fourier_peak_hz": 2829.7179039763178,
+      "dominant_frequency_range_hz": [
+        2828.8744329000256,
+        3169.6800000000003
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.45_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509306276,
+      "total_mass_solar": 2.9
+    },
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1290.0,
+            1610.0
+          ],
+          "figure5_line_hz": 1450.0,
+          "local_fourier_maximum_in_bounds_hz": 1606.9492914549876,
+          "mode": "f_spiral_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1450.0,
+            "frequency_90th_percentile_hz": 1510.0,
+            "median_frequency_hz": 1498.0,
+            "supported_duration_ms": 2.910674999999972
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1338.0,
+            "frequency_90th_percentile_hz": 1386.0,
+            "median_frequency_hz": 1354.0,
+            "supported_duration_ms": 2.9697749999999714
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            1860.0,
+            2380.0
+          ],
+          "figure5_line_hz": 2140.0,
+          "local_fourier_maximum_in_bounds_hz": 2379.441624365226,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1880.0,
+            "frequency_90th_percentile_hz": 2139.6000000000004,
+            "median_frequency_hz": 1990.0,
+            "supported_duration_ms": 2.689049999999974
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1904.0,
+            "frequency_90th_percentile_hz": 2057.2,
+            "median_frequency_hz": 1940.0,
+            "supported_duration_ms": 2.482199999999976
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            2430.0,
+            2670.0
+          ],
+          "figure5_line_hz": 2550.0,
+          "local_fourier_maximum_in_bounds_hz": 2495.1089255496463,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0335195530726257,
+            "frequency_10th_percentile_hz": 2563.6708860759495,
+            "frequency_90th_percentile_hz": 2666.9620253164558,
+            "median_frequency_hz": 2648.73417721519,
+            "supported_duration_ms": 2.6447249999999745
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 2469.493670886076,
+            "frequency_90th_percentile_hz": 2636.5822784810125,
+            "median_frequency_hz": 2615.3164556962024,
+            "supported_duration_ms": 2.999324999999971
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            3910.0,
+            4330.0
+          ],
+          "figure5_line_hz": 4120.0,
+          "local_fourier_maximum_in_bounds_hz": 4007.045791031717,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 3978.0,
+            "frequency_90th_percentile_hz": 4038.0,
+            "median_frequency_hz": 4002.0,
+            "supported_duration_ms": 3.10274999999997
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 4050.0,
+            "frequency_90th_percentile_hz": 4234.0,
+            "median_frequency_hz": 4174.0,
+            "supported_duration_ms": 2.0980499999999798
+          }
+        }
+      ],
+      "component_mass_solar": 1.5,
+      "dominant_fourier_peak_hz": 2916.468379864322,
+      "dominant_frequency_range_hz": [
+        2894.074000000074,
+        3308.0
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.50_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 67681.89509305531,
+      "total_mass_solar": 3.0
+    },
+    {
+      "bands": [
+        {
+          "analysis_bounds_hz": [
+            1510.0,
+            1830.0
+          ],
+          "figure5_line_hz": 1670.0,
+          "local_fourier_maximum_in_bounds_hz": 1825.890968697141,
+          "mode": "f_spiral_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1634.0,
+            "frequency_90th_percentile_hz": 1634.0,
+            "median_frequency_hz": 1634.0,
+            "supported_duration_ms": 0.8495625000000916
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 1826.0,
+            "frequency_90th_percentile_hz": 1826.0,
+            "median_frequency_hz": 1826.0,
+            "supported_duration_ms": 1.1081250000001195
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            2180.0,
+            2650.0
+          ],
+          "figure5_line_hz": 2420.0,
+          "local_fourier_maximum_in_bounds_hz": 2552.9425761421567,
+          "mode": "f_2_minus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 2211.864406779661,
+            "frequency_90th_percentile_hz": 2211.864406779661,
+            "median_frequency_hz": 2211.864406779661,
+            "supported_duration_ms": 0.7683000000000828
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 2223.813559322034,
+            "frequency_90th_percentile_hz": 2223.813559322034,
+            "median_frequency_hz": 2223.813559322034,
+            "supported_duration_ms": 0.6205500000000669
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            2540.0,
+            2780.0
+          ],
+          "figure5_line_hz": 2660.0,
+          "local_fourier_maximum_in_bounds_hz": 2751.2293781726153,
+          "mode": "f_spiral",
+          "wsst1_ridge": {
+            "boundary_fraction": 1.0,
+            "frequency_10th_percentile_hz": 2540.0,
+            "frequency_90th_percentile_hz": 2540.0,
+            "median_frequency_hz": 2540.0,
+            "supported_duration_ms": 0.4432500000000478
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 2652.4050632911394,
+            "frequency_90th_percentile_hz": 2652.4050632911394,
+            "median_frequency_hz": 2652.4050632911394,
+            "supported_duration_ms": 0.435862500000047
+          }
+        },
+        {
+          "analysis_bounds_hz": [
+            4020.0,
+            4450.0
+          ],
+          "figure5_line_hz": 4280.0,
+          "local_fourier_maximum_in_bounds_hz": 4081.4033417936093,
+          "mode": "f_2_plus_0",
+          "wsst1_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 4091.6666666666665,
+            "frequency_90th_percentile_hz": 4091.6666666666665,
+            "median_frequency_hz": 4091.6666666666665,
+            "supported_duration_ms": 0.8421750000000907
+          },
+          "wsst2_ridge": {
+            "boundary_fraction": 0.0,
+            "frequency_10th_percentile_hz": 4370.37037037037,
+            "frequency_90th_percentile_hz": 4370.37037037037,
+            "median_frequency_hz": 4370.37037037037,
+            "supported_duration_ms": 0.5762250000000622
+          }
+        }
+      ],
+      "component_mass_solar": 1.55,
+      "dominant_fourier_peak_hz": 3048.6595812183036,
+      "dominant_frequency_range_hz": [
+        3047.0952801000212,
+        3464.48
+      ],
+      "fft_padded_length": 16384,
+      "file": "Z4c-mpa1-m1.55_d40_r1875_R300_psi4_rstrain.asc",
+      "sample_rate_hz": 135363.7901861265,
+      "total_mass_solar": 3.1
+    }
+  ]
+}

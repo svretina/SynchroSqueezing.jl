@@ -1,0 +1,263 @@
+{
+  "experiments": [
+    "focused low-frequency WSST1/WSST2 of original analytic h_plus",
+    "complex dominant-mode reconstruction, subtraction, and residual WSST1/WSST2"
+  ],
+  "limitations": [
+    "Candidate low-frequency ridges are phenomenological and are not assigned physical mode labels.",
+    "Each panel is normalized to its own low-band maximum; colors do not compare absolute amplitudes between panels.",
+    "A ridge after subtraction is not evidence by itself because subtraction error can create coherent residual structure.",
+    "The focused output grid uses a denser 64-voice CWT, but the backend still constructs its full wavelet bank."
+  ],
+  "schema_version": 1,
+  "settings": {
+    "display_db": [
+      -50.0,
+      0.0
+    ],
+    "dominant_frequency_range_hz": [
+      2000.0,
+      4200.0
+    ],
+    "dominant_reconstruction_halfwidth_hz": 150.0,
+    "input": "FFT analytic signal of h_plus",
+    "residual_transform_input": "positive-frequency projection of the complex time-domain residual",
+    "secondary_frequency_bins": 600,
+    "secondary_frequency_range_hz": [
+      1350.0,
+      2500.0
+    ],
+    "subtraction": "complex analytic input minus complex ridge reconstruction",
+    "time_range_ms": [
+      0.0,
+      15.0
+    ],
+    "voices_per_octave": 64
+  },
+  "waveforms": [
+    {
+      "component_mass_solar": 1.2,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.753499674514948,
+      "file": "Z4c-mpa1-m1.20_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.010935601458080195,
+        "median_frequency_hz": 2438.5642737896496,
+        "supported_duration_ms": 12.159824999999882
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.00558659217877095,
+        "median_frequency_hz": 2436.644407345576,
+        "supported_duration_ms": 13.223624999999872
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.033485451179476704,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1955.7178631051752,
+        "supported_duration_ms": 5.762249999999945
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.007692307692307693,
+        "median_frequency_hz": 2471.202003338898,
+        "supported_duration_ms": 1.9207499999999815
+      },
+      "time_domain_residual_relative_l2": 0.5273262576657441
+    },
+    {
+      "component_mass_solar": 1.25,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.7613444187101474,
+      "file": "Z4c-mpa1-m1.25_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.413312693498452,
+        "median_frequency_hz": 2496.160267111853,
+        "supported_duration_ms": 9.544649999999908
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1408.5559265442403,
+        "supported_duration_ms": 2.1571499999999793
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.031444424607268893,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1912.5208681135225,
+        "supported_duration_ms": 4.1369999999999605
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1939.398998330551,
+        "supported_duration_ms": 2.3935499999999768
+      },
+      "time_domain_residual_relative_l2": 0.5044287894840396
+    },
+    {
+      "component_mass_solar": 1.3,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.7741134049703716,
+      "file": "Z4c-mpa1-m1.30_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1522.787979966611,
+        "supported_duration_ms": 3.8710499999999626
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1470.9515859766277,
+        "supported_duration_ms": 1.433174999999986
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.02394883206846548,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1609.1819699499165,
+        "supported_duration_ms": 2.3344499999999777
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 2044.991652754591,
+        "supported_duration_ms": 2.6299499999999747
+      },
+      "time_domain_residual_relative_l2": 0.4902819977330176
+    },
+    {
+      "component_mass_solar": 1.35,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.7960411756223299,
+      "file": "Z4c-mpa1-m1.35_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1501.669449081803,
+        "supported_duration_ms": 1.6843499999999838
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1388.397328881469,
+        "supported_duration_ms": 1.5365999999999853
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.020192587847861352,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1616.8614357262104,
+        "supported_duration_ms": 4.077899999999961
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1499.7495826377296,
+        "supported_duration_ms": 1.2558749999999879
+      },
+      "time_domain_residual_relative_l2": 0.4676064742952306
+    },
+    {
+      "component_mass_solar": 1.4,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.7712502313358288,
+      "file": "Z4c-mpa1-m1.40_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1387.4373956594322,
+        "supported_duration_ms": 2.3935499999999768
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1583.2637729549247,
+        "supported_duration_ms": 1.7434499999999833
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.03301436385431679,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1958.5976627712855,
+        "supported_duration_ms": 2.984549999999971
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.01694915254237288,
+        "median_frequency_hz": 1371.118530884808,
+        "supported_duration_ms": 1.7434499999999833
+      },
+      "time_domain_residual_relative_l2": 0.4929823022918324
+    },
+    {
+      "component_mass_solar": 1.45,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.707700555163186,
+      "file": "Z4c-mpa1-m1.45_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1378.797996661102,
+        "supported_duration_ms": 2.5265249999999755
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1647.5792988313856,
+        "supported_duration_ms": 1.5809249999999848
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.036667745125138096,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.03225806451612903,
+        "median_frequency_hz": 1377.838063439065,
+        "supported_duration_ms": 1.8320999999999823
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1534.3071786310518,
+        "supported_duration_ms": 0.9751499999999906
+      },
+      "time_domain_residual_relative_l2": 0.5641230039588724
+    },
+    {
+      "component_mass_solar": 1.5,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.6561164650963959,
+      "file": "Z4c-mpa1-m1.50_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1497.8297161936562,
+        "supported_duration_ms": 2.9697749999999714
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1674.457429048414,
+        "supported_duration_ms": 3.7085249999999643
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.020792943342875864,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1523.7479131886475,
+        "supported_duration_ms": 3.811949999999963
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1642.779632721202,
+        "supported_duration_ms": 2.570849999999975
+      },
+      "time_domain_residual_relative_l2": 0.5800242249765551
+    },
+    {
+      "component_mass_solar": 1.55,
+      "dominant_reconstruction_halfwidth_hz": 150.0,
+      "dominant_reconstruction_relative_l2": 0.5546758816785555,
+      "file": "Z4c-mpa1-m1.55_d40_r1875_R300_psi4_rstrain.asc",
+      "original_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1611.10183639399,
+        "supported_duration_ms": 0.5171250000000558
+      },
+      "original_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1820.3672787979967,
+        "supported_duration_ms": 0.4801875000000517
+      },
+      "residual_positive_frequency_projection_change_relative_l2": 0.028494441231572798,
+      "residual_wsst1_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1568.864774624374,
+        "supported_duration_ms": 0.42108750000004536
+      },
+      "residual_wsst2_candidate": {
+        "boundary_fraction": 0.0,
+        "median_frequency_hz": 1722.4540901502505,
+        "supported_duration_ms": 0.5097375000000549
+      },
+      "time_domain_residual_relative_l2": 0.6781798026585657
+    }
+  ]
+}

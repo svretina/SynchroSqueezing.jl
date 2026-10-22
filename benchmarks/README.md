@@ -82,3 +82,15 @@ gates and native timings in one JSON document. It emits a cross-language
 ratio only for an operation whose gate passed. See the documentation page
 "Julia and Python performance" for the audited function mapping and workload
 matrix commands.
+
+## Second-order WSST
+
+Run the Milestone 06 first- versus second-order comparison with:
+
+```bash
+julia --project=benchmarks benchmarks/wsst2.jl
+```
+
+It writes `validation/wsst2_06.json`, including analytical chirp regimes,
+interior and boundary accuracy, concentration, coefficient validity,
+reconstruction, runtime, allocations, thread counts, and package versions.

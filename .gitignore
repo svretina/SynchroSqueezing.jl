@@ -21,3 +21,12 @@ benchmarks/results/
 # Local graph analysis
 graphify-out/GRAPH_REPORT.md
 graphify-out/cache/
+
+# Excluded directories
+/examples/
+/graphify-out/
+
+# Numerical waveform data
+*.h5
+*.hdf5
+*.hdf

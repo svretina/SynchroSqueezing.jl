@@ -143,7 +143,10 @@ end
     metadata = (; sample_rate = 10.0, sample_interval = 0.1)
     result = WSSTResult(
         coefficients, frequencies, collect(-0.5:1.0:20.5), :linear,
-        ones(length(frequencies)), :nearest, NoThreshold(), diagnostics, convention,
+        ones(length(frequencies)), :nearest, NoThreshold(),
+        ReassignmentMetadata(1, :phase_derivative, :reference, NaN, :none, Inf,
+                             0.0, 0.0, 0.0, nothing),
+        diagnostics, convention,
         nothing, zeros(ComplexF64, 4), metadata, nothing, nothing, nothing, nothing,
     )
     config = RidgeConfig(activity_threshold = 0.0)

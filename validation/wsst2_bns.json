@@ -1,0 +1,117 @@
+{
+  "limitations": [
+    "This controlled waveform is BNS-like, not a numerical-relativity catalogue waveform.",
+    "Mode labels and search intervals are supplied inputs; the transform does not infer physical identity.",
+    "Sensitivity ranges vary reconstruction bandwidth and damping-fit window only.",
+    "Periodic boundary errors are reported separately from the interior."
+  ],
+  "milestone": "06-bns-like-validation",
+  "schema_version": 1,
+  "signal": {
+    "damping_times_s": [
+      0.045,
+      0.12
+    ],
+    "description": "controlled two-mode damped nonlinear-chirp BNS post-merger analogue",
+    "frequency_search_ranges_hz": [
+      [
+        800.0,
+        1720.0
+      ],
+      [
+        1740.0,
+        1980.0
+      ]
+    ],
+    "sample_rate_hz": 4096.0,
+    "samples": 1024
+  },
+  "wsst1": {
+    "modes": [
+      {
+        "damping_fit_standard_error_s": 5.080919271473171e-5,
+        "damping_relative_error": -0.04698932520889476,
+        "damping_sensitivity_range_s": [
+          0.042547005211641266,
+          0.043404297755972786
+        ],
+        "estimated_damping_time_s": 0.042885480365599735,
+        "reconstruction_relative_l2": 0.0532678096166786,
+        "reconstruction_srer_db": 25.470703222534198,
+        "ridge_boundary_rmse_hz": 5.693254781627009,
+        "ridge_interior_bias_hz": -0.1485735591402749,
+        "ridge_interior_rmse_hz": 0.5463147718644767,
+        "support_stop_reason": "relative_amplitude",
+        "support_stop_time_s": 0.12890625,
+        "true_damping_time_s": 0.045
+      },
+      {
+        "damping_fit_standard_error_s": 0.0004364099540265194,
+        "damping_relative_error": -0.03710404621991814,
+        "damping_sensitivity_range_s": [
+          0.11135587019057716,
+          0.11795552547427338
+        ],
+        "estimated_damping_time_s": 0.11554751445360982,
+        "reconstruction_relative_l2": 0.40694921451964516,
+        "reconstruction_srer_db": 7.809195708864576,
+        "ridge_boundary_rmse_hz": 8.960639651901007,
+        "ridge_interior_bias_hz": -1.3295329512627116,
+        "ridge_interior_rmse_hz": 3.4526175992847152,
+        "support_stop_reason": "end_of_data",
+        "support_stop_time_s": null,
+        "true_damping_time_s": 0.12
+      }
+    ],
+    "ownership_conservation_relative_l2": 1.5388504351876466e-16,
+    "reassignment": {
+      "excluded_fraction": 0.0,
+      "fallback_fraction": 0.0,
+      "second_order_valid_fraction": 0.0
+    }
+  },
+  "wsst2": {
+    "modes": [
+      {
+        "damping_fit_standard_error_s": 5.739818190186624e-5,
+        "damping_relative_error": -0.06823600546425179,
+        "damping_sensitivity_range_s": [
+          0.04165157164585992,
+          0.04241262318743975
+        ],
+        "estimated_damping_time_s": 0.04192937975410867,
+        "reconstruction_relative_l2": 0.07007274965622536,
+        "reconstruction_srer_db": 23.089016808942233,
+        "ridge_boundary_rmse_hz": 8.610922756631878,
+        "ridge_interior_bias_hz": 0.025377722364540667,
+        "ridge_interior_rmse_hz": 0.492118549453835,
+        "support_stop_reason": "relative_amplitude",
+        "support_stop_time_s": 0.12646484375,
+        "true_damping_time_s": 0.045
+      },
+      {
+        "damping_fit_standard_error_s": 0.000518398121110524,
+        "damping_relative_error": -0.0180353575443416,
+        "damping_sensitivity_range_s": [
+          0.11546216617849672,
+          0.11971952461326443
+        ],
+        "estimated_damping_time_s": 0.117835757094679,
+        "reconstruction_relative_l2": 0.4101163228688172,
+        "reconstruction_srer_db": 7.741858903897589,
+        "ridge_boundary_rmse_hz": 6.731297751804049,
+        "ridge_interior_bias_hz": 0.5207560281469623,
+        "ridge_interior_rmse_hz": 2.2508291460847167,
+        "support_stop_reason": "end_of_data",
+        "support_stop_time_s": null,
+        "true_damping_time_s": 0.12
+      }
+    ],
+    "ownership_conservation_relative_l2": 1.423187725220303e-16,
+    "reassignment": {
+      "excluded_fraction": 0.0,
+      "fallback_fraction": 0.18232057817260386,
+      "second_order_valid_fraction": 0.8176794218273962
+    }
+  }
+}

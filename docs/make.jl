@@ -14,6 +14,8 @@ makedocs(
         "Backend decision" => "backend_decision.md",
         "CWT backend adapter" => "backend_adapter.md",
         "WSST theory" => "wsst_theory.md",
+        "Second-order WSST" => "wsst2.md",
+        "WSST2 validation" => "wsst2_validation.md",
         "WSST conventions" => "wsst_conventions.md",
         "WSST inverse" => "wsst_inverse.md",
         "Reconstruction audit" => "reconstruction_audit.md",

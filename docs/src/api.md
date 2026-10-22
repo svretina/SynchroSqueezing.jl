@@ -12,6 +12,8 @@ SynchroSqueezing.plan_cwt
 SynchroSqueezing.cwt
 SynchroSqueezing.inverse_cwt
 SynchroSqueezing.instantaneous_frequency
+SynchroSqueezing.second_order_operators
+SynchroSqueezing.second_order_frequency
 SynchroSqueezing.linear_frequency_grid
 SynchroSqueezing.log_frequency_grid
 SynchroSqueezing.wsst
@@ -47,6 +49,9 @@ SynchroSqueezing.CWTPlan
 SynchroSqueezing.CWTMetadata
 SynchroSqueezing.CWTResult
 SynchroSqueezing.FrequencyEstimate
+SynchroSqueezing.SecondOrderOperators
+SynchroSqueezing.SecondOrderEstimate
+SynchroSqueezing.ReassignmentMetadata
 SynchroSqueezing.RelativeThreshold
 SynchroSqueezing.RidgeConfig
 SynchroSqueezing.PredictiveRidgeConfig
