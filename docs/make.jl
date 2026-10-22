@@ -23,6 +23,8 @@ makedocs(
         "Ridge tracking" => "ridge_tracking.md",
         "Predictive ridge tracking" => "predictive_ridge_tracking.md",
         "Damping estimation" => "damping_estimation.md",
+        "Performance and regression" => "performance.md",
+        "Julia and Python performance" => "julia_python_performance.md",
         "WSST numerics" => "wsst_numerics.md",
         "WSST validation" => "wsst_validation.md",
         "API status" => "api.md",

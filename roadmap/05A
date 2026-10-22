@@ -1,0 +1,115 @@
+# Milestone 05 — Additional Scientific and Performance Requirements
+
+Retain the existing Milestone 05 specification. Add the following requirements.
+
+## 1. Numerical reference freeze
+
+Before any optimization, generate and preserve baseline outputs for representative synthetic cases.
+
+Include:
+
+- CWT coefficients and spectral derivatives.
+- Complex WSST coefficients.
+- Extracted ridge trajectories.
+- Reconstructed complex components.
+- Component amplitude envelopes.
+- Activity and boundary-reliability masks.
+- Termination times and reasons.
+- Exponential damping estimates.
+- Local decay-rate estimates where defined.
+
+Preserve configurations, random seeds, transform conventions, library versions, and expected numerical tolerances.
+
+Optimizations must not silently alter scientifically meaningful outputs.
+
+## 2. Full-pipeline profiling
+
+Benchmark the following stages separately:
+
+1. CWT initialization and planning.
+2. CWT execution.
+3. Spectral differentiation.
+4. Phase estimation and complex reassignment.
+5. Single-ridge dynamic programming.
+6. Multiple frequency-constrained ridge extractions.
+7. Component reconstruction and ownership bookkeeping.
+8. Envelope extraction and activity analysis.
+9. Damping estimation.
+10. End-to-end execution.
+
+Determine actual bottlenecks through profiling before changing implementations.
+
+## 3. Batch scientific workflow
+
+Support efficient analysis of multiple modes from one WSST result.
+
+Avoid recomputing the CWT or WSST for every requested frequency range.
+
+Reuse mathematical metadata and intermediate arrays where safe.
+
+Separate immutable reusable plans/configurations from mutable workspaces.
+
+Document whether each workspace may be shared between threads.
+
+## 4. End-to-end scientific regression
+
+After optimization, compare the optimized pipeline with the validated scalar/reference implementation.
+
+In addition to coefficient-level errors, compare:
+
+- Ridge-frequency RMSE.
+- Component reconstruction errors.
+- Envelope differences.
+- Damping-time estimates.
+- Termination times.
+- Activity masks and classifications.
+- Component ownership and residual conservation.
+
+An optimization is not accepted solely because its SST matrix is numerically close to the reference.
+
+If a downstream discrete decision changes, report and investigate it.
+
+## 5. Benchmark methodology
+
+Use BenchmarkTools.jl with compilation and planning excluded from steady-state measurements.
+
+Report cold-start and planning costs separately.
+
+Prevent compiler constant folding of benchmark workloads and ensure benchmark setup/reset does not contaminate timings.
+
+For any method that mutates a workspace, restore required input and workspace state between benchmark evaluations.
+
+Benchmark Julia and pinned Python implementations using equivalent mathematical configurations and computational workloads.
+
+Do not report total-pipeline speedup if the implementations perform different scientific operations.
+
+Include runtime distributions, allocations, memory consumption, thread configurations, and relative speedup.
+
+## 6. Optimization priorities
+
+Optimize according to measured contribution to total runtime.
+
+Prefer:
+
+- Reusing FFTW plans.
+- Reusing backend wavelet filters.
+- Reducing allocations in repeated CWT/WSST calls.
+- Fusing phase estimation and coefficient deposition where equivalent.
+- Reducing intermediate array creation.
+- Efficient frequency-constrained DP.
+- Batched component reconstruction.
+- Safe CPU parallelism.
+
+Do not replace a mature CWT backend unless profiling shows a material bottleneck that cannot be resolved through supported configuration, caching, or upstream improvements.
+
+## 7. Acceptance
+
+Milestone 05 passes when:
+
+- Optimized kernels satisfy their numerical regression tests.
+- Full scientific outputs remain consistent with the validated implementation.
+- Repeated workloads demonstrate measured allocation and/or runtime improvements.
+- Threaded execution passes race and numerical correctness tests.
+- Benchmark results are reproducible.
+- Python comparisons use matched configurations.
+- Performance results are documented without concealing cases where Julia is slower.

@@ -1,0 +1,383 @@
+# Milestone 05A — Julia vs. ssqueezepy Performance Benchmark
+
+## Objective
+
+Establish reproducible, scientifically fair performance comparisons between `SynchroSqueezing.jl` and Python's `ssqueezepy==0.6.6`.
+
+Benchmark only operations that are mathematically equivalent and available in both implementations.
+
+The purpose is to determine whether Julia is faster, slower, or comparable for the same numerical workloads, and identify which stages account for any differences.
+
+Do not modify either implementation's mathematical parameters to obtain favorable benchmark results.
+
+## 1. Inspect both implementations
+
+Before benchmarking, inspect the relevant Julia functions and the installed pinned Python source.
+
+Identify comparable operations, including:
+
+- CWT computation.
+- CWT time derivative.
+- CWT plus derivative.
+- Instantaneous-frequency estimation.
+- WSST reassignment.
+- Full first-order WSST.
+- Standard inverse WSST.
+- Reconstruction from a specified frequency band.
+
+For each operation, record the exact functions called and whether the implementations have equivalent mathematical behavior.
+
+Do not assume that similarly named functions perform identical work.
+
+Produce a comparison table documenting input/output arrays, normalization, algorithms, and any differences.
+
+## 2. Benchmark only genuinely comparable workloads
+
+### Benchmark A — CWT
+
+Julia:
+
+    W = cwt(x, ...)
+
+Python:
+
+    W = ssqueezepy.cwt(x, ...)
+
+Require equivalent:
+
+- Input signal.
+- Sampling rate.
+- Wavelet Fourier response.
+- Wavelet parameters.
+- Scale coordinates.
+- CWT normalization.
+- Padding and boundary conventions.
+- Numerical precision.
+- Fourier-transform conventions.
+
+Where the libraries use different internal implementations, this is acceptable as long as the mathematical operation and numerical output are equivalent within established tolerances.
+
+### Benchmark B — CWT with time derivative
+
+Compute:
+
+    W, dW = cwt_with_derivative(x, ...)
+
+Benchmark the equivalent Python operation that computes the CWT and its time derivative.
+
+Measure the combined cost as well as the additional derivative cost when supported by both implementations.
+
+Do not compare a Julia CWT-plus-derivative operation against a Python CWT-only operation.
+
+Confirm that derivatives use equivalent physical time units.
+
+### Benchmark C — Synchrosqueezing reassignment
+
+Provide identical precomputed CWT coefficients and derivative arrays to both implementations.
+
+Benchmark:
+
+    T = synchrosqueeze(W, dW, ...)
+
+Use:
+
+- Identical scale quadrature.
+- Identical frequency-bin coordinates.
+- Equivalent phase estimator.
+- Equivalent amplitude threshold.
+- Equivalent deposition rule.
+
+Perform this comparison separately from the CWT benchmark.
+
+Do not include CWT computation in either reassignment timing.
+
+If Python's selected reassignment kernel uses a different deposition rule from Julia, report that configuration as unsupported for strict comparison rather than presenting a misleading speedup.
+
+### Benchmark D — Complete first-order WSST
+
+Benchmark the equivalent operation:
+
+    x -> CWT -> derivative -> reassignment -> T
+
+This is the main end-to-end benchmark.
+
+Exclude:
+
+- Ridge tracking.
+- Component reconstruction.
+- Activity detection.
+- Damping estimation.
+- Plotting.
+- File loading.
+
+Use the same mathematical settings and output precision.
+
+This gives the clearest overall Julia-versus-Python comparison for the core purpose of the package.
+
+### Benchmark E — Standard inverse WSST
+
+Provide identical precomputed complex SST coefficients and reconstruction metadata.
+
+Measure:
+
+    T -> reconstructed waveform
+
+Compare both real-signal and analytic-complex reconstruction where supported equivalently.
+
+Use the standard inverse from Milestone 03A rather than a backend-specific frame correction.
+
+Exclude WSST computation from timing.
+
+### Benchmark F — Fixed-band component reconstruction
+
+Use an identical supplied frequency-time mask.
+
+Benchmark only:
+
+    T + mask -> reconstructed component
+
+The mask must be precomputed before timing unless both implementations construct it as part of the same explicitly defined operation.
+
+Do not include ridge extraction.
+
+Compare full-band and restricted-band inverse timings separately.
+
+## 3. Ridge extraction comparison
+
+Our Julia implementation includes frequency-constrained dynamic programming with physical continuity penalties and optional second-order prediction.
+
+Python's ridge implementation may not optimize exactly the same objective.
+
+Therefore:
+
+- Do not directly compare arbitrary default ridge-extraction calls.
+- Inspect the Python algorithm and objective.
+- Benchmark ridge extraction only if equivalent objective functions, transition constraints, initialization rules, and output semantics can be established.
+- If equivalent configurations are unavailable, exclude ridge tracking from the strict language speedup comparison.
+
+Optionally report an exploratory ridge benchmark in a separate section explicitly labeled **different algorithms — not directly comparable**.
+
+Do not include this exploratory result in the primary Julia/Python speedup summary.
+
+## 4. Workload matrix
+
+Use deterministic synthetic signals with fixed random seeds.
+
+Benchmark signal lengths:
+
+| Samples | Purpose |
+|---|---|
+| 2,048 | Small workload |
+| 8,192 | Moderate workload |
+| 32,768 | Large workload |
+| 131,072 | Very large workload |
+
+Use Float32 and Float64 separately.
+
+For each length, benchmark representative CWT scale counts, such as:
+
+- 16 voices per octave.
+- 32 voices per octave.
+- 64 voices per octave.
+
+For WSST, use equivalent frequency grids, initially 160, 320, and 640 bins.
+
+Avoid a full Cartesian sweep if it becomes excessively expensive. Select a documented, balanced set of configurations while ensuring both languages receive identical workloads.
+
+Include one configuration representative of our current three-oscillator examples.
+
+## 5. Numerical equivalence gate
+
+Before measuring performance, run both implementations and compare their results.
+
+Required checks:
+
+1. CWT coefficients agree within the relevant floating-point tolerance.
+2. CWT derivatives agree.
+3. Instantaneous-frequency estimates agree over valid coefficients.
+4. Reassigned complex coefficients agree for equivalent deposition.
+5. Full inverse reconstructions agree.
+6. Fixed-band component reconstructions agree.
+
+Use appropriate absolute and relative error metrics.
+
+For phase estimates, exclude coefficients below the agreed numerical validity threshold.
+
+If two functions are mathematically equivalent but discretized differently, measure convergence to independent analytical ground truth and document their differing accuracy.
+
+Do not declare a strict comparison valid solely because final plots look similar.
+
+If an operation fails the equivalence checks, preserve the failure information and exclude it from the primary performance ratios until resolved.
+
+## 6. Timing methodology
+
+Julia:
+
+- Use BenchmarkTools.jl.
+- Warm up compiled functions.
+- Exclude Julia JIT compilation from steady-state timings.
+- Report first-call compilation and initialization separately.
+- Exclude FFT planning from execution benchmarks when reusable plans are employed.
+- Use properly constructed benchmark inputs to avoid constant folding.
+- Reset mutable inputs/workspaces where necessary.
+
+Python:
+
+- Use a suitable high-resolution timer or reliable benchmarking framework.
+- Warm up all compiled Numba and cached execution paths.
+- Exclude Numba JIT compilation from steady-state timings.
+- Record first-call and warm-call timings separately.
+- Ensure optional GPU execution is disabled.
+- Avoid including Python-to-Julia or Julia-to-Python communication in either timing.
+
+For both:
+
+- Run repeated independent measurements.
+- Report median, minimum, and variability.
+- Use sufficiently long measurement intervals.
+- Minimize unrelated system activity.
+- Avoid including fixture generation, logging, plotting, or file I/O.
+- Measure peak memory and allocations where practical, documenting differences in measurement methodology.
+
+Do not treat JIT startup time as numerical execution time.
+
+## 7. Thread configuration
+
+Start with a single-CPU-thread comparison.
+
+Record:
+
+- Julia thread count.
+- FFTW thread count.
+- Python numerical-library thread limits.
+- Numba thread count.
+- Relevant OpenMP and BLAS settings.
+- CPU model and available cores.
+
+For the primary comparison, configure each implementation to avoid internal thread oversubscription.
+
+Then optionally benchmark parallel configurations separately.
+
+Run both languages with comparable CPU-resource limits.
+
+Do not compare eight-thread Julia execution against single-thread Python and call the result a language speedup.
+
+Report execution configurations explicitly.
+
+## 8. Memory benchmarks
+
+Measure memory usage independently from timing when memory instrumentation materially alters execution.
+
+Report:
+
+- Input and output array sizes.
+- Peak working memory where measurable.
+- Julia allocated bytes per call.
+- Python peak or tracked allocations, with the measurement method stated.
+- Reusable plan and workspace memory.
+- Allocations for cold and repeated workloads.
+
+Do not present Julia allocated bytes and Python tracemalloc measurements as strictly equivalent without qualification.
+
+Track allocations separately from speed because an implementation can be faster while allocating more memory.
+
+## 9. Speedup calculation
+
+For each matched operation and configuration, calculate:
+
+    speedup = median_python_time / median_julia_time
+
+Interpretation:
+
+- speedup > 1: Julia faster.
+- speedup = 1: comparable.
+- speedup < 1: Python faster.
+
+Also provide the reciprocal slowdown when appropriate.
+
+Never compare results obtained using different wavelets, scale counts, grids, precisions, or scientific operations without explicit qualification.
+
+Do not combine incompatible benchmarks into a single overall speedup.
+
+## 10. Output format
+
+Create:
+
+    benchmarks/python_comparison.py
+    benchmarks/julia_python_comparison.jl
+    validation/julia_python_benchmarks.json
+    docs/src/julia_python_performance.md
+
+The Julia orchestration script should run or import the benchmark outputs without contaminating the timed sections.
+
+Use a shared benchmark specification for both languages.
+
+Each JSON entry should contain:
+
+- Benchmark operation.
+- Configuration identifier.
+- Signal length.
+- Dtype.
+- Wavelet and parameters.
+- Scale count.
+- Output frequency-bin count.
+- Thread configuration.
+- Numerical equivalence result.
+- Median runtime.
+- Runtime spread.
+- Peak memory or allocation data.
+- Computed speedup.
+- Julia and Python versions.
+- Relevant package versions.
+- CPU and system information.
+
+Record unsupported comparisons explicitly instead of omitting them silently.
+
+## 11. Reporting
+
+Generate summary tables for:
+
+A. CWT.
+
+B. CWT plus derivative.
+
+C. Synchrosqueezing reassignment.
+
+D. Complete first-order WSST.
+
+E. Standard inverse WSST.
+
+F. Fixed-band component reconstruction.
+
+Include runtime-versus-signal-length graphs for the main comparable operations.
+
+Use log-scaled axes when helpful and include memory scaling where available.
+
+Highlight configurations where Python is faster just as prominently as configurations where Julia is faster.
+
+Provide a brief explanation of likely bottlenecks based on profiling evidence, not speculation alone.
+
+## 12. Acceptance criteria
+
+The task is complete when:
+
+1. The mathematical equivalence of each compared operation is established.
+2. Both implementations use matching numerical configurations.
+3. Python Numba/JIT compilation and Julia JIT compilation are excluded from steady-state timings.
+4. Single-thread benchmarks are reproducible.
+5. CPU resources are documented and comparable.
+6. The results include runtime and memory measurements.
+7. Julia/Python speedups are computed independently for each operation.
+8. Non-equivalent ridge algorithms are excluded from the strict comparison.
+9. Results are recorded in machine-readable JSON.
+10. The documentation includes reproducible benchmark commands.
+11. Cases where Julia is slower are retained and reported.
+12. Existing scientific regression tests continue to pass.
+
+## Final requirement
+
+The primary reported number should be the measured speedup for the **complete first-order WSST under matched mathematical settings**.
+
+Secondary numbers should describe the individual matched CWT, derivative, reassignment, and inverse operations.
+
+Do not claim a full scientific-pipeline speedup unless every included stage is equivalent and included in both implementations.

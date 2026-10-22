@@ -1,0 +1,347 @@
+{
+  "comparison": {
+    "complete_first_order_wsst": {
+      "julia_median_ms": 32.934960000000004,
+      "python_median_ms": 18.9391215,
+      "python_over_julia": null,
+      "strictly_comparable": false
+    },
+    "cwt": {
+      "julia_median_ms": 6.1499865,
+      "python_median_ms": 3.302396,
+      "python_over_julia": 0.5369761380777015,
+      "strictly_comparable": true
+    },
+    "cwt_and_derivative": {
+      "julia_median_ms": 7.034193999999999,
+      "python_median_ms": 6.987292,
+      "python_over_julia": 0.9933322851203706,
+      "strictly_comparable": true
+    },
+    "fixed_band_reconstruction": {
+      "julia_median_ms": 0.464009,
+      "python_median_ms": 0.5271060000000001,
+      "python_over_julia": 1.1359822762058496,
+      "strictly_comparable": true
+    },
+    "phase_estimation": {
+      "julia_median_ms": 16.145169,
+      "python_median_ms": 2.0991455,
+      "python_over_julia": null,
+      "strictly_comparable": false
+    },
+    "reassignment": {
+      "julia_median_ms": 23.8550725,
+      "python_median_ms": 7.8171990000000005,
+      "python_over_julia": null,
+      "strictly_comparable": false
+    },
+    "standard_inverse_wsst": {
+      "julia_median_ms": 0.18752649999999998,
+      "python_median_ms": 1.6372665,
+      "python_over_julia": 8.73085403929578,
+      "strictly_comparable": true
+    }
+  },
+  "configuration": {
+    "absolute_threshold": 1.0e-8,
+    "admissibility": 0.6553434149791622,
+    "boundary": "periodic/no padding",
+    "frequency_bins": 160,
+    "precision": "Float64",
+    "reassignment": "nearest center",
+    "sample_rate_hz": 512.0,
+    "samples": 2048,
+    "voices_per_octave": 16.0,
+    "wavelet": "generalized Morse gamma=3 beta=20, analytic L1/bandpass"
+  },
+  "environment": {
+    "cpu": "Intel(R) Core(TM) Ultra 7 155U",
+    "fftw_threads": 1,
+    "julia_threads": 1,
+    "julia_version": "1.13.0-rc1",
+    "logical_cores": 14,
+    "package_versions": {
+      "BenchmarkTools": "1.8.0",
+      "ContinuousWavelets": "1.2.2",
+      "FFTW": "1.10.0",
+      "JSON": "1.11.0"
+    }
+  },
+  "generated_at_utc": "2026-10-21T17:32:09.257",
+  "julia": {
+    "cold_current_process": {
+      "complete_after_plan_ms": 2170.5431559999997,
+      "plan_ms": 8174.067575
+    },
+    "process_maxrss_bytes": 1315627008,
+    "resident_array_bytes": {
+      "cwt_coefficients": 5242936,
+      "cwt_derivative": 5242936,
+      "fixed_band_mask": 41032,
+      "reusable_plan": 1328616,
+      "signal": 16424,
+      "wsst_coefficients": 5242928
+    },
+    "timings": {
+      "complete_first_order_wsst": {
+        "allocated_bytes": 42337448,
+        "allocations": 217,
+        "median_ms": 32.934960000000004,
+        "minimum_ms": 29.142564,
+        "q25_ms": 30.299057000000005,
+        "q75_ms": 37.289245,
+        "samples": 6
+      },
+      "cwt": {
+        "allocated_bytes": 26271160,
+        "allocations": 84,
+        "median_ms": 6.1499865,
+        "minimum_ms": 3.754614,
+        "q25_ms": 3.8990340000000003,
+        "q75_ms": 6.25736925,
+        "samples": 12
+      },
+      "cwt_and_derivative": {
+        "allocated_bytes": 36880576,
+        "allocations": 142,
+        "median_ms": 7.034193999999999,
+        "minimum_ms": 5.077096,
+        "q25_ms": 6.0617339999999995,
+        "q75_ms": 9.337772750000001,
+        "samples": 12
+      },
+      "fixed_band_reconstruction": {
+        "allocated_bytes": 82632,
+        "allocations": 11,
+        "median_ms": 0.464009,
+        "minimum_ms": 0.446238,
+        "q25_ms": 0.456981,
+        "q75_ms": 0.49574375000000004,
+        "samples": 12
+      },
+      "phase_estimation": {
+        "allocated_bytes": 2662608,
+        "allocations": 7,
+        "median_ms": 16.145169,
+        "minimum_ms": 9.068882,
+        "q25_ms": 10.039305,
+        "q75_ms": 18.691554,
+        "samples": 12
+      },
+      "reassignment": {
+        "allocated_bytes": 5456872,
+        "allocations": 75,
+        "median_ms": 23.8550725,
+        "minimum_ms": 14.656924,
+        "q25_ms": 14.79386475,
+        "q75_ms": 27.92456675,
+        "samples": 12
+      },
+      "standard_inverse_wsst": {
+        "allocated_bytes": 82184,
+        "allocations": 10,
+        "median_ms": 0.18752649999999998,
+        "minimum_ms": 0.16792,
+        "q25_ms": 0.17560975,
+        "q75_ms": 0.20084775,
+        "samples": 12
+      }
+    }
+  },
+  "methodology": [
+    "Both implementations run with one application, FFT/BLAS, and Numba thread.",
+    "Julia BenchmarkTools and Python perf_counter_ns measure warmed native calls; process startup and fixture I/O are excluded.",
+    "The same typed signal, sampled Fourier response, scales, physical derivative units, threshold, and nearest-bin centers are used.",
+    "A ratio is emitted only when the numerical equivalence gate for that operation passes.",
+    "Julia allocation bytes and Python tracemalloc peaks use different accounting and must not be compared as identical metrics."
+  ],
+  "milestone": "05B",
+  "primary_metric": "complete_first_order_wsst when equivalence gate passes",
+  "python": {
+    "schema_version": 1,
+    "implementation": "Python ssqueezepy",
+    "versions": {
+      "python": "3.13.9",
+      "numpy": "2.3.3",
+      "scipy": "1.18.1",
+      "numba": "0.68.0",
+      "ssqueezepy": "0.6.6"
+    },
+    "environment": {
+      "platform": "Linux-6.17.10-100.fc41.x86_64-x86_64-with-glibc2.40",
+      "processor": "",
+      "pid": 60826,
+      "numba_threads": 1,
+      "thread_environment": {
+        "OMP_NUM_THREADS": "1",
+        "OPENBLAS_NUM_THREADS": "1",
+        "MKL_NUM_THREADS": "1",
+        "NUMBA_NUM_THREADS": "1",
+        "SSQ_GPU": "0"
+      }
+    },
+    "configuration": {
+      "absolute_threshold": 1.0e-8,
+      "admissibility": 0.6553434149791622,
+      "boundary": "periodic/no padding",
+      "frequency_bins": 160,
+      "precision": "Float64",
+      "reassignment": "nearest center",
+      "sample_rate_hz": 512.0,
+      "samples": 2048,
+      "voices_per_octave": 16.0,
+      "wavelet": "generalized Morse gamma=3 beta=20, analytic L1/bandpass"
+    },
+    "scale_adapter": {
+      "formula": "a_py = omega_peak * N * ((N/2+1)/(N/2)) / (2*pi*s_julia)",
+      "endpoint_factor": 1.0009765625,
+      "python_scale_order": "ascending dilation; outputs reversed for ascending frequency",
+      "nyquist_note": "ssqueezepy halves its analytic Nyquist filter bin; the deterministic fixture has zero Nyquist input."
+    },
+    "admissibility": {
+      "julia": 0.6553434149791622,
+      "python": 0.6553434149791625,
+      "absolute_difference": 3.3306690738754696e-16
+    },
+    "equivalence": {
+      "cwt": {
+        "relative_l2": 1.4506748546295295e-15,
+        "maximum_absolute": 2.3525204118543076e-15,
+        "passed": true
+      },
+      "cwt_from_combined_call": {
+        "relative_l2": 1.4506748546295295e-15,
+        "maximum_absolute": 2.3525204118543076e-15,
+        "passed": true
+      },
+      "derivative": {
+        "relative_l2": 1.539533367634022e-15,
+        "maximum_absolute": 7.978038862220396e-13,
+        "passed": true
+      },
+      "phase": {
+        "relative_l2": 0.10879448295925447,
+        "maximum_absolute": 1261.4977889100714,
+        "compared_coefficients": 124928,
+        "passed": false
+      },
+      "reassignment": {
+        "relative_l2": 0.010711776133444505,
+        "maximum_absolute": 0.01951780538120362,
+        "orientation_audit": {
+          "current": 0.010711776133444505,
+          "row_reversed": 1.4141975672795362,
+          "complex_conjugated": 1.4141877289638045,
+          "reference_peak_rows": [
+            139,
+            129,
+            111
+          ],
+          "python_peak_rows": [
+            139,
+            129,
+            111
+          ],
+          "returned_frequencies_ascending": false
+        },
+        "passed": false
+      },
+      "complete_wsst": {
+        "relative_l2": 0.010711776133444505,
+        "maximum_absolute": 0.01951780538120362,
+        "passed": false
+      },
+      "standard_inverse": {
+        "relative_l2": 6.039565443804046e-16,
+        "maximum_absolute": 1.7763568394002505e-15,
+        "passed": true
+      },
+      "fixed_band_inverse": {
+        "relative_l2": 5.96384693219071e-16,
+        "maximum_absolute": 1.3322676295501878e-15,
+        "passed": true
+      }
+    },
+    "timings": {
+      "cwt": {
+        "first_call_ms": 20.464456,
+        "minimum_ms": 3.229491,
+        "median_ms": 3.302396,
+        "q25_ms": 3.2471025,
+        "q75_ms": 3.4001355,
+        "samples": 12,
+        "python_tracemalloc_peak_bytes": 15802847
+      },
+      "cwt_and_derivative": {
+        "first_call_ms": 5.894748,
+        "minimum_ms": 6.01624,
+        "median_ms": 6.987292,
+        "q25_ms": 6.1989304999999995,
+        "q75_ms": 8.17122975,
+        "samples": 12,
+        "python_tracemalloc_peak_bytes": 26288445
+      },
+      "phase_estimation": {
+        "first_call_ms": 4.893941,
+        "minimum_ms": 2.000529,
+        "median_ms": 2.0991455,
+        "q25_ms": 2.0767595,
+        "q75_ms": 2.1435530000000003,
+        "samples": 12,
+        "python_tracemalloc_peak_bytes": 5254483
+      },
+      "reassignment": {
+        "first_call_ms": 10.785603,
+        "minimum_ms": 7.279549,
+        "median_ms": 7.8171990000000005,
+        "q25_ms": 7.615178,
+        "q75_ms": 8.3518955,
+        "samples": 12,
+        "python_tracemalloc_peak_bytes": 15747114
+      },
+      "complete_first_order_wsst": {
+        "first_call_ms": 22.274595,
+        "minimum_ms": 17.073059,
+        "median_ms": 18.9391215,
+        "q25_ms": 18.207079750000002,
+        "q75_ms": 19.545512,
+        "samples": 6,
+        "python_tracemalloc_peak_bytes": 21044161
+      },
+      "standard_inverse_wsst": {
+        "first_call_ms": 2.24047,
+        "minimum_ms": 1.564811,
+        "median_ms": 1.6372665,
+        "q25_ms": 1.6182185,
+        "q75_ms": 1.765946,
+        "samples": 12,
+        "python_tracemalloc_peak_bytes": 5678288
+      },
+      "fixed_band_reconstruction": {
+        "first_call_ms": 0.780091,
+        "minimum_ms": 0.510342,
+        "median_ms": 0.5271060000000001,
+        "q25_ms": 0.5182942500000001,
+        "q75_ms": 0.55939325,
+        "samples": 12,
+        "python_tracemalloc_peak_bytes": 5293312
+      }
+    },
+    "strict_comparability": {
+      "cwt": true,
+      "cwt_and_derivative": true,
+      "phase_estimation": false,
+      "reassignment": false,
+      "complete_first_order_wsst": false,
+      "standard_inverse_wsst": true,
+      "fixed_band_reconstruction": true,
+      "ridge_tracking": false
+    },
+    "unsupported": {
+      "analytic_complex_inverse": "ssqueezepy issq_cwt exposes real synthesis only",
+      "ridge_tracking": "objectives and transition constraints differ"
+    }
+  },
+  "schema_version": 1
+}

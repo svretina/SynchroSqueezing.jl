@@ -26,11 +26,18 @@ Milestone 04C adds analytic ridge-component envelopes, weighted log-linear
 and nonlinear exponential damping fits, local damping rates, explicit sample
 selection, local WSST-prominence diagnostics, persistent operational mode
 termination, and separate fit-versus-reconstruction sensitivity diagnostics.
+Milestone 05A is in progress: the repository now includes a frozen
+full-pipeline scientific regression, reproducible stage-by-stage profiling,
+and a memory-bounded ridge-DP optimization. On the recorded 1024-sample
+workload, the first optimized ridge kernel was about 26.6 times faster while
+preserving the dense reference path exactly.
 
 See the [roadmap](roadmap/README.md), [numerical conventions](docs/src/conventions.md),
 [dependency audit](docs/src/dependency_audit.md), and [provisional backend
 decision](docs/src/backend_decision.md), and [CWT adapter
 contract](docs/src/backend_adapter.md).
+Performance methodology and current measurements are documented in
+[`docs/src/performance.md`](docs/src/performance.md).
 
 ## Development
 

@@ -141,8 +141,9 @@ function _path_diagnostics(
         local_energy[column] = energies[row, column]
         active[column] = local_energy[column] > zero(T) &&
                          local_energy[column] >= activity_floor
-        admissible = findall(@view eligible[:, column])
-        boundary[column] = row == first(admissible) || row == last(admissible)
+        first_admissible = findfirst(@view eligible[:, column])
+        last_admissible = findlast(@view eligible[:, column])
+        boundary[column] = row == first_admissible || row == last_admissible
     end
     return RidgeResult(
         indices,
@@ -156,6 +157,41 @@ function _path_diagnostics(
         (T(freqrange[1]), T(freqrange[2])),
         config,
     )
+end
+
+"""Return the first and last eligible row in each time column without allocating."""
+function _eligible_bounds(eligible::AbstractMatrix)
+    ntime = size(eligible, 2)
+    lower = zeros(Int, ntime)
+    upper = zeros(Int, ntime)
+    for column in axes(eligible, 2)
+        first_row = findfirst(@view eligible[:, column])
+        first_row === nothing && continue
+        lower[column] = first_row
+        upper[column] = findlast(@view eligible[:, column])
+    end
+    return lower, upper
+end
+
+"""Precompute the time-independent continuity objective on the used row span."""
+function _transition_costs(frequencies, first_row, last_row, config::RidgeConfig)
+    T = eltype(frequencies)
+    count = last_row - first_row + 1
+    costs = Matrix{T}(undef, count, count)
+    for current in first_row:last_row, previous in first_row:last_row
+        costs[previous - first_row + 1, current - first_row + 1] =
+            _transition_cost(frequencies[previous], frequencies[current], config)
+    end
+    return costs
+end
+
+const _MAX_TRANSITION_CACHE_BYTES = 64 * 1024^2
+
+function _cache_transition_costs(frequencies, first_row, last_row, config)
+    count = last_row - first_row + 1
+    maximum_cached_rows = floor(Int, sqrt(_MAX_TRANSITION_CACHE_BYTES ÷ sizeof(eltype(frequencies))))
+    return count <= maximum_cached_rows ?
+        _transition_costs(frequencies, first_row, last_row, config) : nothing
 end
 
 function _maximum_ridge(costs, energies, frequencies, times, eligible, global_reference,
@@ -212,7 +248,16 @@ function _dynamic_ridge(
     previous = fill(T(Inf), nfrequency)
     current = similar(previous)
     predecessors = zeros(Int, nfrequency, ntime)
-    for row in 1:nfrequency
+    lower_eligible, upper_eligible = _eligible_bounds(eligible)
+    any(iszero, lower_eligible) && throw(ArgumentError(
+        "each time column must contain at least one eligible ridge state",
+    ))
+    first_used = minimum(lower_eligible)
+    last_used = maximum(upper_eligible)
+    transition_costs = _cache_transition_costs(
+        frequencies, first_used, last_used, config,
+    )
+    for row in lower_eligible[1]:upper_eligible[1]
         eligible[row, 1] && (previous[row] = costs[row, 1] + start_cost[row])
     end
     any(isfinite, previous) || throw(ArgumentError("no valid initial ridge state"))
@@ -220,25 +265,38 @@ function _dynamic_ridge(
     for column in 2:ntime
         fill!(current, T(Inf))
         delta_time = times[column] - times[column - 1]
-        for row in 1:nfrequency
+        for row in lower_eligible[column]:upper_eligible[column]
             eligible[row, column] || continue
-            lower = 1
-            upper = nfrequency
+            lower = lower_eligible[column - 1]
+            upper = upper_eligible[column - 1]
             if banded && config.max_rate !== nothing
                 maximum_jump = config.max_rate * delta_time
-                lower = searchsortedfirst(frequencies, frequencies[row] - maximum_jump)
-                upper = searchsortedlast(frequencies, frequencies[row] + maximum_jump)
+                lower = max(
+                    lower,
+                    searchsortedfirst(frequencies, frequencies[row] - maximum_jump),
+                )
+                upper = min(
+                    upper,
+                    searchsortedlast(frequencies, frequencies[row] + maximum_jump),
+                )
             end
+            lower <= upper || continue
             best_cost = T(Inf)
             best_predecessor = 0
-            for predecessor in lower:upper
+            @inbounds for predecessor in lower:upper
                 isfinite(previous[predecessor]) || continue
                 _transition_allowed(
                     frequencies[predecessor], frequencies[row], delta_time, config,
                 ) || continue
-                candidate = previous[predecessor] + _transition_cost(
-                    frequencies[predecessor], frequencies[row], config,
-                )
+                transition = if transition_costs === nothing
+                    _transition_cost(frequencies[predecessor], frequencies[row], config)
+                else
+                    transition_costs[
+                        predecessor - first_used + 1,
+                        row - first_used + 1,
+                    ]
+                end
+                candidate = previous[predecessor] + transition
                 if candidate < best_cost
                     best_cost = candidate
                     best_predecessor = predecessor

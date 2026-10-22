@@ -15,6 +15,7 @@ include("test_predictive_ridges.jl")
 include("test_ridge_reconstruction.jl")
 include("test_damping.jl")
 include("test_mode_support.jl")
+include("test_scientific_regression.jl")
 
 @testset "SynchroSqueezing.jl package foundation" begin
     @test SynchroSqueezing.package_version() == v"0.1.0-DEV"

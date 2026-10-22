@@ -11,7 +11,7 @@ Pages = ["conventions.md", "wsst_theory.md", "wsst_conventions.md",
          "wsst_synthesis_theory.md", "wsst_backend_validation.md",
          "wsst_component_reconstruction.md", "ridge_tracking.md",
          "predictive_ridge_tracking.md", "wsst_numerics.md",
-         "damping_estimation.md",
+         "damping_estimation.md", "performance.md",
          "wsst_validation.md"]
 Depth = 2
 ```

@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "milestone": "05A",
+  "generated_at_utc": "2026-10-21T17:13:46.202",
+  "environment": {
+    "cpu": "Intel Core Ultra 7 155U",
+    "architecture": "x86_64",
+    "logical_cpus": 14,
+    "memory_bytes": 33114558464,
+    "julia_version": "1.13.0-rc1",
+    "julia_threads": 1,
+    "fftw_threads": 1,
+    "ContinuousWavelets_version": "1.2.2",
+    "BenchmarkTools_version": "1.8.0"
+  },
+  "measured_optimization": {
+    "workload": {
+      "samples": 1024,
+      "wsst_frequency_bins": 256,
+      "ridge_freqrange_hz": [25.0, 60.0],
+      "ridge_method": "dp",
+      "maximum_rate": null,
+      "benchmark_samples": 8,
+      "benchmark_evals": 1
+    },
+    "before": {
+      "median_ms": 521.2421155,
+      "allocated_bytes": 7256064
+    },
+    "after": {
+      "median_ms": 19.5616175,
+      "allocated_bytes": 6482664
+    },
+    "median_speedup": 26.646166427699548,
+    "allocation_reduction_fraction": 0.10658671147332766,
+    "scientific_result": "identical ridge indices and total cost"
+  },
+  "full_pipeline_profile": {
+    "configuration": {
+      "samples": 1024,
+      "sample_rate_hz": 512.0,
+      "voices_per_octave": 16,
+      "wsst_frequency_bins": 384,
+      "requested_samples_per_stage": 10,
+      "benchmark_evals": 1
+    },
+    "cold_current_process_seconds": {
+      "planning": 0.178365013,
+      "pipeline_after_planning": 7.889040584
+    },
+    "steady_state": {
+      "cwt_initialization_and_planning": {"median_ms": 13.4410195, "allocated_bytes": 8094920},
+      "backend_cwt_execution": {"median_ms": 2.8791555, "allocated_bytes": 11828328},
+      "spectral_differentiation": {"median_ms": 2.0183675, "allocated_bytes": 4744656},
+      "phase_estimation": {"median_ms": 6.9426925, "allocated_bytes": 1198288},
+      "phase_and_complex_reassignment": {"median_ms": 10.5548465, "allocated_bytes": 6422952},
+      "single_ridge_dynamic_programming": {"median_ms": 10.523366, "allocated_bytes": 9697512},
+      "multiple_frequency_constrained_ridges": {"median_ms": 21.183277, "allocated_bytes": 19387936},
+      "component_reconstruction_and_ownership": {"median_ms": 6.106503, "allocated_bytes": 9686704},
+      "envelope_and_activity_analysis": {"median_ms": 0.0395745, "allocated_bytes": 223696},
+      "damping_estimation": {"median_ms": 0.024784, "allocated_bytes": 141136},
+      "end_to_end_after_planning": {"median_ms": 42.402459, "allocated_bytes": 52497048}
+    },
+    "notes": [
+      "The first-call pipeline time includes compilation in the current process.",
+      "The multiple-ridge stage reuses one CWT and one WSST result.",
+      "Allocated bytes are per evaluation, not peak resident memory.",
+      "No Python speedup is reported because the available Python workflow does not perform the same downstream scientific operations."
+    ]
+  }
+}

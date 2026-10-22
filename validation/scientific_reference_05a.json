@@ -1,0 +1,75 @@
+{
+  "schema_version": 1,
+  "milestone": "05A",
+  "purpose": "pre-optimization full-pipeline scientific reference",
+  "environment": {
+    "julia_version": "1.13.0-rc1",
+    "ContinuousWavelets_version": "1.2.2",
+    "FFTW_version": "1.10.0",
+    "boundary": "periodic",
+    "normalization": "analytic_l1"
+  },
+  "configuration": {
+    "samples": 512,
+    "sample_rate_hz": 256.0,
+    "voices_per_octave": 16,
+    "random_seed": 20261021,
+    "noise_standard_deviation": 0.0,
+    "true_frequencies_hz": [35.0, 85.0],
+    "true_damping_times_seconds": [0.4, 1.8],
+    "wsst_freqrange_hz": [20.0, 100.0],
+    "wsst_frequency_bins": 321,
+    "wsst_relative_threshold": 1e-8,
+    "ridge_freqranges_hz": [[30.0, 40.0], [80.0, 90.0]],
+    "ridge_max_rate_hz_per_second": 20.0,
+    "reconstruction_bandwidth_hz": 5.0,
+    "ownership": "exclusive",
+    "activity_relative_amplitude_threshold": 0.05
+  },
+  "coefficient_reference": {
+    "cwt_sum_abs2": 821.8365305134133,
+    "cwt_maximum_abs": 0.8298071636847494,
+    "derivative_sum_abs2": 168920232.36692262,
+    "derivative_maximum_abs": 375.9745846118161,
+    "phase_valid_count": 60097,
+    "phase_valid_fnv1a": "13305173286416559536",
+    "wsst_sum_abs2": 12.459383448542308,
+    "wsst_maximum_abs": 0.25366820680807683,
+    "optimized_equals_scalar_reference": true
+  },
+  "mode_reference": [
+    {
+      "ridge_indices_fnv1a": "6634319957677014403",
+      "ridge_rmse_hz": 0.0,
+      "active_samples": 494,
+      "boundary_samples": 0,
+      "reconstruction_relative_l2_error": 0.13096369367277588,
+      "support_samples": 315,
+      "stop_time_seconds": 1.23046875,
+      "stop_reason": "relative_amplitude",
+      "estimated_damping_time_seconds": 0.4059973121295616,
+      "median_local_decay_rate_per_second": 2.497721936909386
+    },
+    {
+      "ridge_indices_fnv1a": "16681778427934260611",
+      "ridge_rmse_hz": 0.0,
+      "active_samples": 497,
+      "boundary_samples": 0,
+      "reconstruction_relative_l2_error": 0.17296139410192277,
+      "support_samples": 498,
+      "stop_time_seconds": 1.95703125,
+      "stop_reason": "invalid_component",
+      "estimated_damping_time_seconds": 1.7921505590619795,
+      "median_local_decay_rate_per_second": 0.566324378884616
+    }
+  ],
+  "ownership_reference": {
+    "maximum_partition_error": 0.0,
+    "component_plus_residual_relative_conservation_error": 1.6314778602021017e-16
+  },
+  "tolerance_policy": {
+    "continuous_summary_relative_tolerance": 2e-10,
+    "discrete_ridge_and_mask_decisions": "exact",
+    "optimized_vs_scalar_wsst": "exact for the pinned environment"
+  }
+}

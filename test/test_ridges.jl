@@ -35,6 +35,20 @@ function exhaustive_ridge(coefficients, frequencies, times, freqrange;
     return best_path, best_cost
 end
 
+@testset "Ridge continuity cache is memory bounded" begin
+    config = RidgeConfig(Float64)
+    small = SynchroSqueezing._cache_transition_costs(
+        collect(1.0:16.0), 1, 16, config,
+    )
+    @test size(small) == (16, 16)
+    @test small[3, 7] == SynchroSqueezing._transition_cost(3.0, 7.0, config)
+
+    large_frequencies = collect(1.0:3000.0)
+    @test SynchroSqueezing._cache_transition_costs(
+        large_frequencies, 1, length(large_frequencies), config,
+    ) === nothing
+end
+
 @testset "Frequency-constrained ridge baseline" begin
     frequencies = [10.0, 20.0, 30.0, 40.0]
     times = [0.0, 1.0, 2.0]
